@@ -52,6 +52,22 @@
 \section{Introduction}
 \label{sec:Introduction}
 
+The demands of parallel rendering continue to grow as visualization is
+applied to ever larger scientific data.  Early efforts have demonstrated
+the need on specialized visualization clusters containing hundreds of
+nodes.  Because of recent constraints in building HEREHEREHERE
+
+Although many aspects of parallel rendering have changed since the sorting
+classification of parallel rendering algorithms was introduced \sticky{cite
+  Molnar}, these classifications are still used today because they
+accurately characterize and predict the scaling performance of these
+algorithms.  When rendering on a hundred or more distributed nodes, the
+most efficient class of algorithm is sort-last because it scales extremely
+well with respect to the number of processes and size of the geometry being
+rendered and because the main contributing factor to its overhead, the size
+of the image being rendered, is fixed by the display that we are
+using\sticky{cite 2001 CG\&A}.
+
 \begin{itemize}
 \item An introduction to a sort-last rendering framework named
   \keyterm{IceT} that is general perpose, production quality, and fully
@@ -75,6 +91,6 @@
 
 binary swap, direct send, slic, 2-3 swap, radix-k.
 
-run length encoding. image interlacing.
+run length encoding. image interlacing.  hybrid.  Wes' egpgv.
 
 \end{document}
