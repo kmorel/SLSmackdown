@@ -1,5 +1,11 @@
 % -*- latex -*-
-\documentclass[letterpaper,10pt]{article}
+\documentclass[letterpaper,twocolumn,10pt]{article}
+
+\usepackage{color}
+\definecolor{yellow}{rgb}{1,1,0}
+\definecolor{black}{rgb}{0,0,0}
+\definecolor{ltcyan}{rgb}{.75,1,1}
+\definecolor{red}{rgb}{1,0,0}
 
 \title{Sort-Last Smackdown!}
 \author{Kenneth Moreland}
@@ -13,14 +19,62 @@
 \newcommand*{\lcite}[1]{~\cite{#1}}
 \newcommand*{\scite}[1]{~\cite{#1}}
 
+\newcommand*{\keyterm}[1]{\textbf{#1}}
+
+\newcommand{\sticky}[1]{{\color{red}\textsc{[#1]}}}
+
 \begin{document}
 \maketitle
 
 \begin{abstract}
-  This is the abstract.
+  The only proven method for performing distributed-memory parallel
+  rendering at large scales, tens of thousands of nodes, is a class of
+  algorithms called sort last.  The fundamental operation of sort-last
+  parallel rendering is an image composite, which combines a collection of
+  images generated independently on each node into a single blended image.
+  Over the years numerous image compositing algorithms have been proposed
+  as well as several enhancements and rendering modes to these core
+  algorithms.  However, the testing of these image compositing algorithms
+  has been with an arbitrary set of enhancements, if any are applied at
+  all.  In this paper we take a leading production-quality
+  image-compositing framework, IceT, and use it as a testing framework for
+  the leading image compositing algorithms of today.  The compositing
+  enhancements provided by IceT, including some introduced in this paper,
+  are employed in our measurements.  IceT also provides different
+  compositing mechanisms for different rendering environments such as
+  opaque surface versus volume rendering and fixed point versus floating
+  point color representations.  These variations are also considered in our
+  analysis.  To understand the behavior of these algorithms at vary large
+  scale, we run tests on up to XXX cores of the Intrepid BlueGene/P at
+  Argonne National Laboratories.
 \end{abstract}
 
 \section{Introduction}
 \label{sec:Introduction}
+
+\begin{itemize}
+\item An introduction to a sort-last rendering framework named
+  \keyterm{IceT} that is general perpose, production quality, and fully
+  optimized.
+\item The \keyterm{telescoping} algorithm, which can be applied to an
+  existing image compositing algorithm that works best on powers of two,
+  such as binary swap, to run efficiently on any number of processes.
+\item A new method of \keyterm{image interlacing} that requires no
+  additional image copying to reconstruct the final image.
+\item A comparison of the ever popular binary-swap algorithm with the newer
+  radix-k algorithm on leadership-class \sticky{correct?} high performance
+  computers.  These tests are performed with every optimization one should
+  expect in production quality parallel rendering as well as with a variety
+  of rendering modes that can be encountered in production software.
+\item An investigation comparing the performance of multi-tile compositing
+  techniques \cite{2001 paper} with the best single image compositing
+  techniques for single images.
+\end{itemize}
+
+\section{Previous Work}
+
+binary swap, direct send, slic, 2-3 swap, radix-k.
+
+run length encoding. image interlacing.
 
 \end{document}
