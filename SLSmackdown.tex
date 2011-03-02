@@ -74,9 +74,9 @@
 %%      \parbox{1.4in}{\scriptsize \centering Martha Stewart Enterprises \\ Microsoft Research}}
 
 \author{ %
-  Kenneth Moreland\thanks{e-mail: kmorel@sandia.gov} %
+  Kenneth Moreland\thanks{e-mail: kmorel@sandia.gov} \\ %
     \scriptsize Sandia National Laboratories %
-  \and Et All\thanks{e-mail: et.all@elsewhere.edu} %
+  \and Et All\thanks{e-mail: et.all@elsewhere.edu} \\ %
     \scriptsize Elsewhere %
 }
 
@@ -124,13 +124,23 @@
 % End of vgtc-specific portion of the preamble.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{varioref}
+\usepackage{fancyvrb}
+\usepackage{ifthen}
+\usepackage{cite}
+\usepackage{subfigure}
+\usepackage{xspace}
+\usepackage{hyperref}
+
 \usepackage{color}
 \definecolor{yellow}{rgb}{1,1,0}
 \definecolor{black}{rgb}{0,0,0}
 \definecolor{ltcyan}{rgb}{.75,1,1}
 \definecolor{red}{rgb}{1,0,0}
-
-\author{Kenneth Moreland}
 
 % Cite commands I use to abstract away the different ways to reference an
 % entry in the bibliography (superscripts, numbers, dates, or author
@@ -162,18 +172,34 @@
 The demands of parallel rendering continue to grow as visualization is
 applied to ever larger scientific data.  Early efforts have demonstrated
 the need on specialized visualization clusters containing hundreds of
-nodes.  Because of recent constraints in building HEREHEREHERE
+nodes.  Because of recent constraints in building specialized visualization
+clusters\lcite{Childs2007}, recent research focuses on performing
+visualization directly on the same supercomputing architectures driving
+simulation.  Whereas previous research considers rendering on the order of
+hundreds of processes, recent efforts use over ten thousand
+processes\lcite{Childs2010}.  Furthermore, in an attempted to get around
+bottlenecks introduced by file I/O, it is now more commonplace to have
+visualization run \emph{in-situ} with
+simulation\lcite{Ma2009:SciDACReview,Ma2009:CG&A,Yu2010,Tu2006}, meaning
+parallel rendering will soon run on over a hundred thousand processes.
 
-Although many aspects of parallel rendering have changed since the sorting
-classification of parallel rendering algorithms was
-introduced\lcite{Molnar1994}, these classifications are still used today
-because they accurately characterize and predict the scaling performance of
-these algorithms.  When rendering on a hundred or more distributed nodes,
-the most efficient class of algorithm is sort-last because it scales
-extremely well with respect to the number of processes and size of the
-geometry being rendered and because the main contributing factor to its
-overhead, the size of the image being rendered, is fixed by the display
-that we are using\lcite{Wylie2001}.
+These increased demands on parallel rendering have spawned a resurgence in
+parallel rendering research.  Recent studies investigate the scaling of
+parallel rendering algorithms\lcite{Peterka2009}, the creation of new image
+compositing algorithms\lcite{23swap,radixk}, and new compositing
+optimizations\lcite{Kendall2010}.  Although each of these studies improve
+the state of the art in parallel rendering, all involve locally built
+algorithm implementations that contain some arbitrary subset of
+optimizations and that may or may not be publicly available.  The
+consequence is that it is difficult to repeat the experiments, to compare
+the results with each other, and to apply the algorithms to production
+software.
+
+The intention of this work is to bridge the gap between independent
+parallel rendering algorithm development and practical application by
+bringing together multiple algorithms and optimizations together in a
+production quality parallel rendering library.  More specifically, this
+paper provides the following.
 
 \begin{itemize}
 \item An introduction to a sort-last rendering framework named
@@ -195,6 +221,17 @@ that we are using\lcite{Wylie2001}.
 \end{itemize}
 
 \section{Previous Work}
+
+Although many aspects of parallel rendering have changed since the sorting
+classification of parallel rendering algorithms was
+introduced\lcite{Molnar1994}, these classifications are still used today
+because they accurately characterize and predict the scaling performance of
+these algorithms.  When rendering on a hundred or more distributed nodes,
+the most efficient class of algorithm is sort-last because it scales
+extremely well with respect to the number of processes and size of the
+geometry being rendered and because the main contributing factor to its
+overhead, the size of the image being rendered, is fixed by the display
+that we are using\lcite{Wylie2001}.
 
 binary swap, direct send, slic, 2-3 swap, radix-k.
 
