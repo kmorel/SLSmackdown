@@ -58,15 +58,15 @@ the need on specialized visualization clusters containing hundreds of
 nodes.  Because of recent constraints in building HEREHEREHERE
 
 Although many aspects of parallel rendering have changed since the sorting
-classification of parallel rendering algorithms was introduced \sticky{cite
-  Molnar}, these classifications are still used today because they
-accurately characterize and predict the scaling performance of these
-algorithms.  When rendering on a hundred or more distributed nodes, the
-most efficient class of algorithm is sort-last because it scales extremely
-well with respect to the number of processes and size of the geometry being
-rendered and because the main contributing factor to its overhead, the size
-of the image being rendered, is fixed by the display that we are
-using\sticky{cite 2001 CG\&A}.
+classification of parallel rendering algorithms was
+introduced\lcite{Molnar1994}, these classifications are still used today
+because they accurately characterize and predict the scaling performance of
+these algorithms.  When rendering on a hundred or more distributed nodes,
+the most efficient class of algorithm is sort-last because it scales
+extremely well with respect to the number of processes and size of the
+geometry being rendered and because the main contributing factor to its
+overhead, the size of the image being rendered, is fixed by the display
+that we are using\lcite{Wylie2001}.
 
 \begin{itemize}
 \item An introduction to a sort-last rendering framework named
@@ -78,12 +78,12 @@ using\sticky{cite 2001 CG\&A}.
 \item A new method of \keyterm{image interlacing} that requires no
   additional image copying to reconstruct the final image.
 \item A comparison of the ever popular binary-swap algorithm with the newer
-  radix-k algorithm on leadership-class \sticky{correct?} high performance
-  computers.  These tests are performed with every optimization one should
-  expect in production quality parallel rendering as well as with a variety
-  of rendering modes that can be encountered in production software.
+  radix-k algorithm on leadership-class high-performance computers.  These
+  tests are performed with every optimization one should expect in
+  production quality parallel rendering as well as with a variety of
+  rendering modes that can be encountered in production software.
 \item An investigation comparing the performance of multi-tile compositing
-  techniques \cite{2001 paper} with the best single image compositing
+  techniques\lcite{Moreland2001} with the best single image compositing
   techniques for single images.
 \end{itemize}
 
@@ -92,5 +92,8 @@ using\sticky{cite 2001 CG\&A}.
 binary swap, direct send, slic, 2-3 swap, radix-k.
 
 run length encoding. image interlacing.  hybrid.  Wes' egpgv.
+
+\bibliographystyle{plain}
+\bibliography{SLSmackdown}
 
 \end{document}
