@@ -186,7 +186,7 @@ parallel rendering will soon run on over a hundred thousand processes.
 These increased demands on parallel rendering have spawned a resurgence in
 parallel rendering research.  Recent studies investigate the scaling of
 parallel rendering algorithms\lcite{Peterka2009}, the creation of new image
-compositing algorithms\lcite{23swap,radixk}, and new compositing
+compositing algorithms\lcite{23Swap,RadixK}, and new compositing
 optimizations\lcite{Kendall2010}.  Although each of these studies improve
 the state of the art in parallel rendering, all involve locally built
 algorithm implementations that contain some arbitrary subset of
@@ -232,6 +232,25 @@ extremely well with respect to the number of processes and size of the
 geometry being rendered and because the main contributing factor to its
 overhead, the size of the image being rendered, is fixed by the display
 that we are using\lcite{Wylie2001}.
+
+The main characteristics of sort-last parallel rendering is that geometry
+is statically partitioned, processes each independently render images using
+only their local partition, and these images are \keyterm{composited}
+together by blending or comparing pixels.  Consequently, it is the behavior
+of this compositing operation that determins the overall efficiency of
+sort-last parallel rendering.
+
+Over the years researchers have designed several variations of the image
+compositing algorithm.  One of the oldest and simplest algorithms that is
+still in wide use is direct send\lcite{DirectSend1,DirectSend2}.  Direct
+send assigns each process a unique partition of the image to be rendered.
+After the local geometry is rendered, each process sends each pixel
+fragment directly to the process responsible for compositing it.  Each
+process then collects pixel fragments from all other processes and combines
+them to form its partition of the image.
+
+One of the most popular image compositing algorithms is binary
+swap\lcite{BinarySwap1,BinarySwap2}.
 
 binary swap, direct send, slic, 2-3 swap, radix-k.
 
