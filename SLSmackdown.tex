@@ -151,7 +151,7 @@
 \newcommand*{\lcite}[1]{~\cite{#1}}
 \newcommand*{\scite}[1]{~\cite{#1}}
 
-\newcommand*{\keyterm}[1]{\textbf{#1}}
+\newcommand*{\keyterm}[1]{\emph{#1}}
 
 \newcommand{\sticky}[1]{{\color{red}\textsc{[#1]}}}
 
@@ -170,13 +170,13 @@
 \label{sec:Introduction}
 
 The demands of parallel rendering continue to grow as visualization is
-applied to ever larger scientific data.  Early efforts have demonstrated
-the need on specialized visualization clusters containing hundreds of
-nodes.  Because of recent constraints in building specialized visualization
-clusters\lcite{Childs2007}, recent research focuses on performing
-visualization directly on the same supercomputing architectures driving
-simulation.  Whereas previous research considers rendering on the order of
-hundreds of processes, recent efforts use over ten thousand
+applied to ever larger scientific data.  Early efforts have satisfied the
+need of parallel rendering on specialized visualization clusters containing
+hundreds of nodes.  Because of recent constraints in building specialized
+visualization clusters\lcite{Childs2007}, recent research focuses on
+performing visualization directly on the same supercomputing architectures
+driving simulation.  Whereas previous research considers rendering on the
+order of hundreds of processes, recent efforts use over ten thousand
 processes\lcite{Childs2010}.  Furthermore, in an attempted to get around
 bottlenecks introduced by file I/O, it is now more commonplace to have
 visualization run \emph{in-situ} with
@@ -187,23 +187,23 @@ These increased demands on parallel rendering have spawned a resurgence in
 parallel rendering research.  Recent studies investigate the scaling of
 parallel rendering algorithms\lcite{Peterka2009}, the creation of new image
 compositing algorithms\lcite{23Swap,RadixK}, and new compositing
-optimizations\lcite{Kendall2010}.  Although each of these studies improve
+enhancements\lcite{Kendall2010}.  Although each of these studies improve
 the state of the art in parallel rendering, all involve locally built
 algorithm implementations that contain some arbitrary subset of
-optimizations and that may or may not be publicly available.  The
+enhancements and that may or may not be publicly available.  The
 consequence is that it is difficult to repeat the experiments, to compare
 the results with each other, and to apply the algorithms to production
 software.
 
 The intention of this work is to bridge the gap between independent
 parallel rendering algorithm development and practical application by
-bringing together multiple algorithms and optimizations together in a
+bringing together multiple algorithms and enhancements together in a
 production quality parallel rendering library.  More specifically, this
 paper provides the following.
 
 \begin{itemize}
 \item An introduction to a sort-last rendering framework named
-  \keyterm{IceT} that is general perpose, production quality, and fully
+  \keyterm{IceT} that is general purpose, production quality, and fully
   optimized.
 \item The \keyterm{telescoping} algorithm, which can be applied to an
   existing image compositing algorithm that works best on powers of two,
@@ -212,7 +212,7 @@ paper provides the following.
   additional image copying to reconstruct the final image.
 \item A comparison of the ever popular binary-swap algorithm with the newer
   radix-k algorithm on leadership-class high-performance computers.  These
-  tests are performed with every optimization one should expect in
+  tests are performed with every enhancement one should expect in
   production quality parallel rendering as well as with a variety of
   rendering modes that can be encountered in production software.
 \item An investigation comparing the performance of multi-tile compositing
@@ -221,6 +221,7 @@ paper provides the following.
 \end{itemize}
 
 \section{Previous Work}
+\label{sec:PreviousWork}
 
 Although many aspects of parallel rendering have changed since the sorting
 classification of parallel rendering algorithms was
@@ -234,11 +235,14 @@ overhead, the size of the image being rendered, is fixed by the display
 that we are using\lcite{Wylie2001}.
 
 The main characteristics of sort-last parallel rendering is that geometry
-is statically partitioned, processes each independently render images using
+is statically partitioned; processes each independently render images using
 only their local partition, and these images are \keyterm{composited}
 together by blending or comparing pixels.  Consequently, it is the behavior
-of this compositing operation that determins the overall efficiency of
+of this compositing operation that determines the overall efficiency of
 sort-last parallel rendering.
+
+\subsection{Basic Parallel Compositing Algorithms}
+\label{sec:BasicParallelCompositingAlgorithms}
 
 Over the years researchers have designed several variations of the image
 compositing algorithm.  One of the oldest and simplest algorithms that is
@@ -247,14 +251,62 @@ send assigns each process a unique partition of the image to be rendered.
 After the local geometry is rendered, each process sends each pixel
 fragment directly to the process responsible for compositing it.  Each
 process then collects pixel fragments from all other processes and combines
-them to form its partition of the image.
+them to form its partition of the image.  Although direct send is efficient
+in the amount of data it transfers, the number of messages it generates
+grows quadratically with the number of processes.  Thus, for large numbers
+of processes the network can get overwhelmed by many small messages.
 
 One of the most popular image compositing algorithms is binary
-swap\lcite{BinarySwap1,BinarySwap2}.
+swap\lcite{BinarySwap1,BinarySwap2}.  Binary swap executes in rounds.
+During a round, each process pairs up with another process, the image is
+split in half, the paired processes exchange image halves, and each process
+composites the pixel fragments for the half of the image it received.
+After $\log_{2} n$ rounds, where $n$ is the number of processes, each
+process holds a unique fully-composited partition of the image. \sticky{$n
+  \log_{2} n$ total messages with only $n$ at a time.}
 
-binary swap, direct send, slic, 2-3 swap, radix-k.
+One of the problems with sort last is that it requires a number of
+processes equal to a power of two.  The simplest solution in dealing with
+other process counts is to \keyterm{fold} the images into a group of the
+correct size.  Create the largest group possible with a power of two, and
+then send the image data from those processes outside the group to a
+process inside the group.  Those processes outside the group sit idle while
+those inside the group continue on to composite the image.  This approach
+has inefficiencies because processes have to sit idle during most of the
+computation.  The 2-3 swap algorithm\lcite{23Swap} takes a different
+approach.  It relaxes binary swap such that processes can be grouped into
+pairs of two (like binary swap) or sets of three (unlike binary swap).
+Using these groups of two or three, 2-3 swap can decompose any number of
+processes into groups, and in this way all processes can take part in
+compositing at all times.
 
-run length encoding. image interlacing.  hybrid.  Wes' egpgv.
+Radix-k\lcite{RadixK} is a combination of binary swap and direct send.
+Radix-k first factors the number of processes into a series of what are
+called $k$ values, which need not be prime.  In a sequence of rounds, one
+per $k$ value, radix-k partitions the processes into groups of size $k$ and
+performs a direct send within each group.  The next round recurses into
+processes with the same partition until all $k$ values are used and each
+process has a unique partition.  When it has one round with a $k$ value
+equal to the number of processes, radix-k is equivalent to direct send.
+When it has $\log_{2} n$ rounds with all $k$ values equal to two, radix-k
+is equivalent to binary swap.
+
+Radix-k improves on binary swap by overlapping data transfers with
+computation.  When receiving data from multiple processes, which happens
+whenever $k$ is greater than two, radix-k can begin compositing pixels as
+soon as the first message is received while other messages are still in
+transit.  Yet radix-k retains binary swap's ability to limit the total
+number of messages sent.  Radix-k is also able to handle process groups
+that are not powers of two because the $k$ value for each round can be any
+factor.  That said, if the number of processes factors into large prime
+numbers, the performance can degrade to that of direct send.
+
+\subsection{Compositing Enhancements}
+\label{sec:CompositingEnhancements}
+
+run length encoding. image interlacing.  Wes' egpgv.
+
+slic  hybrid.
 
 %% VGTC-specific section command.
 \acknowledgements{Sandia National Laboratories is a multi-program
