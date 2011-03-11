@@ -153,6 +153,8 @@
 
 \newcommand*{\keyterm}[1]{\emph{#1}}
 
+\newcommand*{\O}[1]{\mathrm{O}\left(#1\right)}
+
 \newcommand{\sticky}[1]{{\color{red}\textsc{[#1]}}}
 
 \begin{document}
@@ -304,9 +306,87 @@ numbers, the performance can degrade to that of direct send.
 \subsection{Compositing Enhancements}
 \label{sec:CompositingEnhancements}
 
-run length encoding. image interlacing.  Wes' egpgv.
+A na\"{i}ve implementation of sort-last image compositing will consider
+every pixel fragment from every process participating.  However, in almost
+all practical use cases the geometry is, or at least can be, partitioned
+spatially.  When each process has geometry in a confined spatial region,
+there is a great deal of empty space in the original rendered images.  A
+pragmatic image compositing algorithm takes advantage of these empty spaces
+in two ways.  First, the pixels in these empty regions will be removed from
+communication, thus making better use of available network bandwidth.
+Second, the empty regions are not considered in the composite operation,
+which reduces the overall computation performed.
 
-slic  hybrid.
+There are two standard approaches for tracking the ``active'' pixels (those
+that have been rendered to) and ``inactive'' pixels (those over empty
+regions).  The first method is to track bounding boxes around geometry.
+Typically, a box around the geometry in each process is projected to screen
+space to define the region of pixels that likely have geometry rendered to
+them.  (The boxes are often expanded to axis aligned bounding boxes to
+simplify management.)  Only the pixels in this region are read, transferred,
+and composited.  \sticky{Ma shows it reduces binary swap from to to.}
+
+\sticky{If the paper is long we can shorten it by removing the discussion
+  on active pixels.}
+
+The second approach for tracking active and inactive pixels is to use
+run-length encoding\sticky{Track down refs}.  A generic run-length encoder
+will look for run lengths of any repeated value.  However, when compositing
+images the active pixels tend to have run lengths of 1, so run-length
+encoding can actually hurt in these regions.  Thus, a better approach is to
+use \keyterm{active pixel encoding}, which classifies the pixels as either
+active or inactive and provide run lengths for continuous regions of any
+active pixels.  Moreland \emph{et al}\scite{Moreland2001} show that this
+encoding is both effective and never adds to the data size even in the
+worst pathological cases.  Active pixel encoding improves on region boxes
+by tightly identifying active and inactive pixels.  There is a greater
+overhead incurred by searching through the image for inactive pixels, but
+this overhead is mitigated by considering the bounding boxes during the
+initial encoding.
+
+Although active pixel encoding almost always improves the performance of
+compositing, it does introduce an issue of load balancing.  As images are
+partitioned, some regions will have more active pixels than others.  By
+balancing the active pixels assigned to regions, the parallel compositing
+becomes better load balanced and performance can improve even further.
+
+The most straightforward way of balancing active pixels is to
+\keyterm{interlace} the images\sticky{cite}.\footnote{Other literature uses
+  the term interleave, but we feel the word interlace is more descriptive.}
+An image is interlaced by rearranging regions of pixels, commonly
+scanlines, in a different order.  This reordering of pixels is designed
+such that when the images are later partitioned, each partition gets pixels
+from all over the images.  Consequently, regions with many active pixels
+are distributed to all the partitions.
+
+The SLIC algorithm\lcite{SLIC} integrates the direct-send algorithm with
+inactive pixel skipping and image interlacing.  It finds areas of geometry
+overlap by projecting bounding boxes to screen space.  SLIC then breaks
+scanlines by areas of overlap and uses a simple hashing function to assign
+these scanline fragments to processes.  The hash function provides load
+balancing and the tracking of overlap limits the total number of messages
+to $\O{n^{4/3}}$, where $n$ is the number of processes, \sticky{check that}
+which is better than the original direct send but worse than binary swap or
+radix-k.
+
+One problem with image interlacing is that the pixels in the fully
+composited region must be rearranged once again into the correct order.
+This added overhead can remove the performance gains of the load
+balancing.  To get around this problem, Kendall \emph{et
+  al}\scite{Kendall2010} propose a method in which the partitioning for the
+radix-k algorithm is adjusted so that each partition has the same amount of
+active pixels.  Although Kendall's algorithm improves load balancing, it
+also adds overhead in readjusting partitions for consistency amongst all
+processes.
+
+Most sort last algorithms rely on a static partitioning of the data to
+produce empty regions of the data.  Hybrid algorithms\sticky{cite} also use
+dynamic partitioning of the data to collect geometry by screen region based
+on the current projection.  Hybrid algorithms reduce the compositing time
+at the expense of redistributing geometry, which means the effectiveness of
+the technique is dependent on the amount of geometry being rendered.  Other
+approaches propose ensuring empty space regions using static partitions
+with replication\sticky{Cite n-way replication.}.
 
 %% VGTC-specific section command.
 \acknowledgements{Sandia National Laboratories is a multi-program
