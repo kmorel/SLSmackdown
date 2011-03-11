@@ -207,6 +207,9 @@ paper provides the following.
 \item An introduction to a sort-last rendering framework named
   \keyterm{IceT} that is general purpose, production quality, and fully
   optimized.
+\item Describe an optimization to the compositing order for radix-k and
+  direct send that minimizes the number of copies of non-overlapping
+  pixels.
 \item The \keyterm{telescoping} algorithm, which can be applied to an
   existing image compositing algorithm that works best on powers of two,
   such as binary swap, to run efficiently on any number of processes.
@@ -217,6 +220,9 @@ paper provides the following.
   tests are performed with every enhancement one should expect in
   production quality parallel rendering as well as with a variety of
   rendering modes that can be encountered in production software.
+\item An investigation of the collection operation required at the end of
+  compositing and adjustments to the compositing algorithms to minimize
+  it.
 \item An investigation comparing the performance of multi-tile compositing
   techniques\lcite{Moreland2001} with the best single image compositing
   techniques for single images.
