@@ -153,7 +153,7 @@
 
 \newcommand*{\keyterm}[1]{\emph{#1}}
 
-\newcommand*{\O}[1]{\mathrm{O}\left(#1\right)}
+\newcommand*{\Oh}{\mathrm{O}}
 
 \newcommand{\sticky}[1]{{\color{red}\textsc{[#1]}}}
 
@@ -365,7 +365,7 @@ overlap by projecting bounding boxes to screen space.  SLIC then breaks
 scanlines by areas of overlap and uses a simple hashing function to assign
 these scanline fragments to processes.  The hash function provides load
 balancing and the tracking of overlap limits the total number of messages
-to $\O{n^{4/3}}$, where $n$ is the number of processes, \sticky{check that}
+to $\Oh(n^{4/3})$, where $n$ is the number of processes, \sticky{check that}
 which is better than the original direct send but worse than binary swap or
 radix-k.
 
