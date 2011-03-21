@@ -402,6 +402,67 @@ effectiveness of the technique is dependent on the amount of geometry being
 rendered.  Other approaches propose ensuring empty space regions using
 static partitions with replication\lcite{Samanta2001}.
 
+\section{Testing Environment}
+\label{sec:TestingEnvironment}
+
+The Image Composition Engine for Tiles (IceT) is a high-performance
+sort-last parallel rendering library\sticky{cite users' guide?}.  Although
+originally created to capture sort-last rendering algorithms for tiled
+displays\lcite{Moreland2001}, IceT also works effectively for smaller
+single image displays.
+
+IceT contains several image compositing algorithms, and its internal
+architecture makes it straightforward to add new algorithms.  It also
+optimizes the compositing process by tracking the projection of geometry
+and compressing images through run-length encoding.  IceT also supports
+multiple rendering modes allowing both color blending for volume rendering
+and z-buffer comparisons for opaque geometries.
+
+IceT is used in multiple production products like ParaView and
+VisIt\sticky{cite?} and has been used to achieve record-breaking rendering
+rates\sticky{cite}.  As such, IceT is an excellent code base for creating,
+testing, and comparing image compositing algorithms.  It already contains
+routines for efficiently capturing, compressing, and compositing images.
+It also contains efficient existing algorithms to which to compare new
+ones.  Furthermore, any optimizations or new algorithms added to IceT can
+be applied to existing production software.
+
+The experiments we run for this paper are encapsulated in IceT's testing
+suite under the SimpleTiming test.  This test evenly partitions volume-wise
+a cube of space amongst processes.  Each process renders a hexahedron
+filling the space it is assigned as a proxy geometry for the rendering.  We
+use this proxy rendering to simplify compiling and porting, which should be
+particularly useful for anyone wishing to repeat these experiments.  In any
+case, the rendering time is discarded as we are interested only in the
+compositing overhead.  Figure~\ref{fig:SimpleTimingOutput} shows an example
+of images rendered by SimpleTiming.  For each SimpleTiming test we render
+101 frames at pseudorandom viewpoints, always using the same seed for
+consistency between experiments.  The time for the first frame is thrown
+out of any average because it contains added overhead of memory allocations
+not included in subsequent frames.
+
+\begin{figure}[htb]
+  \centering
+  \sticky{Output of SimpleTiming.}
+  \caption{Example of images rendered in our experiments.}
+  \label{fig:SimpleTimingOutput}
+\end{figure}
+
+The experiments reported in this paper were run on Argonne National
+Laboratory's Intrepid Blue Gene/P computer.  Intrepid comprises a total of
+40,960 nodes, each containing four cores.  Each experiment was run in one
+of two modes.  The first mode, \keyterm{Shared Memory Processors} (SMP),
+runs a single MPI process on each Intrepid node.  The intention of the mode
+is to run multiple threads to use all four cores, but in our experiments we
+run a single thread using only one core.  The second mode, \keyterm{Virtual
+  Node} (VN), runs four MPI processes on each Intrepid node.  It treats
+each core on the node as a distributed memory processes even though it is
+possible to share memory.  Data transfers amongst the processes within a
+single node still require explicit MPI memory passing although the
+underlying MPI layer bypasses the network infrastructure in this case.  We
+consider both running modes because both are commonly used today and each
+has differing demands on the underlying subsystems.
+
 %% VGTC-specific section command.
 \acknowledgements{Sandia National Laboratories is a multi-program
   laboratory operated by Sandia Corporation, a wholly owned subsidiary of
