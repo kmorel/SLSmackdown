@@ -450,20 +450,29 @@ not included in subsequent frames.
   \label{fig:SimpleTimingOutput}
 \end{figure}
 
-The experiments reported in this paper were run on Argonne National
-Laboratory's Intrepid Blue Gene/P computer.  Intrepid comprises a total of
-40,960 nodes, each containing four cores.  Each experiment was run in one
-of two modes.  The first mode, \keyterm{Shared Memory Processors} (SMP),
-runs a single MPI process on each Intrepid node.  The intention of the mode
-is to run multiple threads to use all four cores, but in our experiments we
-run a single thread using only one core.  The second mode, \keyterm{Virtual
-  Node} (VN), runs four MPI processes on each Intrepid node.  It treats
-each core on the node as a distributed memory processes even though it is
-possible to share memory.  Data transfers amongst the processes within a
-single node still require explicit MPI memory passing although the
-underlying MPI layer bypasses the network infrastructure in this case.  We
-consider both running modes because both are commonly used today and each
-has differing demands on the underlying subsystems.
+Most of the experiments reported in this paper were run on Argonne National
+Laboratory's Intrepid Blue Gene/P computer\lcite{BlueGeneP}.  Intrepid
+comprises a total of 40,960 nodes, each containing four cores.  Each
+experiment was run in one of two modes.  The first mode, \keyterm{Shared
+  Memory Processors} (SMP), runs a single MPI process on each Intrepid
+node.  The intention of the mode is to run multiple threads to use all four
+cores, but in our experiments we run a single thread using only one core.
+The second mode, \keyterm{Virtual Node} (VN), runs four MPI processes on
+each Intrepid node.  It treats each core on the node as a distributed
+memory processes even though it is possible to share memory.  Data
+transfers amongst the processes within a single node still require explicit
+MPI memory passing although the underlying MPI layer bypasses the network
+infrastructure in this case.  We consider both running modes because both
+are commonly used today and each has differing demands on the underlying
+subsystems.
+
+Supplemental experiments were run on Sandia National Laboratories' Red Sky
+computer.  Red Sky comprises a total of 2,279 nodes, each containing dual
+2.93 GHz quad core Nehalem X5570 processors (8 cores in all).  Nodes are
+connected by a QDR InfiniBand network.  All experiments on Red Sky use all
+eight cores of each node (the equivalent of VN mode on Intrepid).  Red Sky
+has faster processors than Intrepid but a slower interconnect, which
+changes the dynamics and optimizations of parallel algorithms run on them.
 
 %% VGTC-specific section command.
 \acknowledgements{Funding for this work was provided by the SciDAC
