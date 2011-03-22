@@ -406,8 +406,8 @@ static partitions with replication\lcite{Samanta2001}.
 \label{sec:TestingEnvironment}
 
 The Image Composition Engine for Tiles (IceT) is a high-performance
-sort-last parallel rendering library\sticky{cite users' guide?}.  Although
-originally created to capture sort-last rendering algorithms for tiled
+sort-last parallel rendering library\lcite{IceT}.  Although originally
+created to capture sort-last rendering algorithms for tiled
 displays\lcite{Moreland2001}, IceT also works effectively for smaller
 single image displays.
 
@@ -418,14 +418,14 @@ and compressing images through run-length encoding.  IceT also supports
 multiple rendering modes allowing both color blending for volume rendering
 and z-buffer comparisons for opaque geometries.
 
-IceT is used in multiple production products like ParaView and
-VisIt\sticky{cite?} and has been used to achieve record-breaking rendering
-rates\sticky{cite}.  As such, IceT is an excellent code base for creating,
-testing, and comparing image compositing algorithms.  It already contains
-routines for efficiently capturing, compressing, and compositing images.
-It also contains efficient existing algorithms to which to compare new
-ones.  Furthermore, any optimizations or new algorithms added to IceT can
-be applied to existing production software.
+IceT is used in multiple production products like ParaView\lcite{ParaView}
+and VisIt\lcite{VisIt} and has been used to achieve record-breaking
+rendering rates\lcite{Higham2005}.  As such, IceT is an excellent code base
+for creating, testing, and comparing image compositing algorithms.  It
+already contains routines for efficiently capturing, compressing, and
+compositing images.  It also contains efficient existing algorithms to
+which to compare new ones.  Furthermore, any optimizations or new
+algorithms added to IceT can be applied to existing production software.
 
 The experiments we run for this paper are encapsulated in IceT's testing
 suite under the SimpleTiming test.  This test evenly partitions volume-wise
@@ -443,8 +443,10 @@ not included in subsequent frames.
 
 \begin{figure}[htb]
   \centering
-  \sticky{Output of SimpleTiming.}
-  \caption{Example of images rendered in our experiments.}
+  \includegraphics[width=.4\linewidth]{images/TransparentOutput}
+  \quad
+  \includegraphics[width=.4\linewidth]{images/OpaqueOutput}
+  \caption{Examples of images rendered in our experiments.}
   \label{fig:SimpleTimingOutput}
 \end{figure}
 
@@ -464,10 +466,14 @@ consider both running modes because both are commonly used today and each
 has differing demands on the underlying subsystems.
 
 %% VGTC-specific section command.
-\acknowledgements{Sandia National Laboratories is a multi-program
-  laboratory operated by Sandia Corporation, a wholly owned subsidiary of
-  Lockheed Martin Corporation, for the U.S. Department of Energy's
-  National Nuclear Security Administration.}
+\acknowledgements{Funding for this work was provided by the SciDAC
+  Institute for Ultrascale Visualization and and by the Advanced Simulation
+  and Computing Program of the National Nuclear Security Adiminstration.
+
+  Sandia National Laboratories is a multi-program laboratory operated by
+  Sandia Corporation, a wholly owned subsidiary of Lockheed Martin
+  Corporation, for the U.S. Department of Energy's National Nuclear
+  Security Administration.}
 
 \bibliographystyle{abbrv}
 \bibliography{SLSmackdown}
