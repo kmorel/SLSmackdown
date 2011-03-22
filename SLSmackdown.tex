@@ -212,11 +212,11 @@ paper provides the following.
 \item Describe an optimization to the compositing order for radix-k and
   direct send that minimizes the number of copies of non-overlapping
   pixels.
+\item A new method of \keyterm{image interlacing} that requires no
+  additional image copying to reconstruct the final image.
 \item The \keyterm{telescoping} algorithm, which can be applied to an
   existing image compositing algorithm that works best on powers of two,
   such as binary swap, to run efficiently on any number of processes.
-\item A new method of \keyterm{image interlacing} that requires no
-  additional image copying to reconstruct the final image.
 \item A comparison of the ever popular binary-swap algorithm with the newer
   radix-k algorithm on leadership-class high-performance computers.  These
   tests are performed with every enhancement one should expect in
@@ -225,9 +225,9 @@ paper provides the following.
 \item An investigation of the collection operation required at the end of
   compositing and adjustments to the compositing algorithms to minimize
   it.
-\item An investigation comparing the performance of multi-tile compositing
-  techniques\lcite{Moreland2001} with the best single image compositing
-  techniques for single images.
+%% \item An investigation comparing the performance of multi-tile compositing
+%%   techniques\lcite{Moreland2001} with the best single image compositing
+%%   techniques for single images.
 \end{itemize}
 
 \section{Previous Work}
@@ -473,6 +473,24 @@ connected by a QDR InfiniBand network.  All experiments on Red Sky use all
 eight cores of each node (the equivalent of VN mode on Intrepid).  Red Sky
 has faster processors than Intrepid but a slower interconnect, which
 changes the dynamics and optimizations of parallel algorithms run on them.
+
+\section{Compositing Order}
+\label{sec:CompositingOrder}
+
+\section{Minimal-Copy Image Interlacing}
+\label{sec:ImageInterlacing}
+
+\section{Telescoping Compositing}
+\label{sec:TelescopingCompositing}
+
+\section{Scaling of Binary Swap and Radix-k}
+\label{sec:Scaling}
+
+\section{Image Collection}
+\label{sec:ImageCollection}
+
+\section{Conclusions}
+\label{sec:Conclusions}
 
 %% VGTC-specific section command.
 \acknowledgements{Funding for this work was provided by the SciDAC
