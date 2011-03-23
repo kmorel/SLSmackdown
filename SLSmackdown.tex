@@ -132,7 +132,7 @@
 \usepackage{fancyvrb}
 \usepackage{ifthen}
 \usepackage{cite}
-\usepackage{subfigure}
+\usepackage{subfig}
 \usepackage{xspace}
 \usepackage{hyperref}
 
@@ -158,6 +158,16 @@
 \newcommand{\Oh}{\mathrm{O}}
 
 \newcommand{\sticky}[1]{{\color{red}\textsc{[#1]}}}
+
+% Avoid putting figures on their own page.
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\topfraction}{0.95}
+
+% Make sure this is big enough so that only big figures end up on their own
+% page but small enough so that if a figure does have to be on its own
+% page, it won't push everything to the bottom because it's not big enough
+% to have its own page.
+\renewcommand{\floatpagefraction}{.75}
 
 \begin{document}
 
@@ -441,7 +451,7 @@ consistency between experiments.  The time for the first frame is thrown
 out of any average because it contains added overhead of memory allocations
 not included in subsequent frames.
 
-\begin{figure}[htb]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=.4\linewidth]{images/TransparentOutput}
   \quad
@@ -476,6 +486,87 @@ changes the dynamics and optimizations of parallel algorithms run on them.
 
 \section{Compositing Order}
 \label{sec:CompositingOrder}
+
+During our integration of radix-k into IceT, we discovered that the
+compositing order of incoming images could make a significant performance
+difference.  In our initial implementation of radix-k, we got dramatically
+different results than those reported by Kendall \etal\scite{Kendall2010}.
+Rather than getting improved performance with radix-k, we saw worse
+performance.  Deeper inspection revealed that although our radix-k
+implementation was properly overlapping communication with compositing
+computations, the computations took longer with larger values of $k$.
+
+This increase in compositing time is caused by a change in the order images
+are composited together.  The order in which images are composited within a
+round is not specified in the original radix-k algorithm; however,
+generally images are composited in the order they are received and
+accumulated in a single buffer, as demonstrated in
+Figure~\ref{fig:CompositeOrder:Accumulative}.  The issue is that composited
+images grow with respect to the non-overlapping pixels in each image.
+Pixels that do not overlap are simply copied to the output.  In the example
+of compositing images for a radix-k round of $k=8$ given in
+Figure~\ref{fig:CompositeOrder:Accumulative}, non-overlapping pixels in the
+leftmost images are copied up to seven times before the final image is
+produced.  In contrast, binary swap performs the equivalent composites in a
+tree-like order as shown in Figure~\ref{fig:CompositeOrder:Tree}, and no
+pixel needs to be copied more than three times.
+
+\begin{figure}[htbp]
+  \centering
+  \subfloat[Accumulative Order]{
+    \includegraphics{images/AccumulativeCompositeOrder}
+    \label{fig:CompositeOrder:Accumulative}
+  }
+  \quad
+  \subfloat[Tree Order]{
+    \includegraphics{images/TreeCompositeOrder}
+    \label{fig:CompositeOrder:Tree}
+  }
+  \caption{Two possible orders for compositing eight images.  Boxes
+    represent images and arrows indicate how two images are composited
+    together to form a third image.}
+  \label{fig:CompositeOrder}
+\end{figure}
+
+Given this observation, we made two independent improvements to the radix-k
+algorithm.  The first improvement speeds-up the compositing computation.
+Specifically, run lengths of non-overlapping pixels to be copied are
+collected and copied in blocks rather than independently cast and copy each
+pixel value, as was done before.  The second improvement constrains the
+compositing to follow the specific tree composite order.  That is, rather
+than composite an incoming image whenever possible, force the compositing
+to happen in an order like that in Figure~\ref{fig:CompositeOrder:Tree}.
+This constraint may cause radix-k to wait longer for incoming images, but
+the overhead is more than compensated by the improved rendering
+performance.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{images/IceTCompositeImprovements0256}
+  \caption{Comparative performance of radix-k with improved compositing
+    computation and changing the order of compositing.  All runs were
+    performed on 256 nodes of Intrepid in VN mode generating images with
+    $2048 \times 2048$ pixels and transparent blending.}
+  \label{fig:IceTCompositeImprovements0256}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{images/IceTCompositeImprovements2048}
+  \caption{Comparative performance of radix-k with improved compositing
+    computation and changing the order of compositing.  All runs were
+    performed on 2048 nodes of Intrepid in VN mode generating images with
+    $2048 \times 2048$ pixels and transparent blending.}
+  \label{fig:IceTCompositeImprovements2048}
+\end{figure}
+
+Results of these performance improvements are independently shown in
+Figures \ref{fig:IceTCompositeImprovements0256} and
+\ref{fig:IceTCompositeImprovements2048}.  The improvements in compositing
+computation lower the overall compositing time and reduce the pixel-copying
+overhead of larger $k$ values.  The change in composite ordering removes
+the extra overhead of pixel-copying and maximizes the performance of larger
+$k$ values.
 
 \section{Minimal-Copy Image Interlacing}
 \label{sec:ImageInterlacing}
