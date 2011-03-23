@@ -1,0 +1,14 @@
+This directory simply captures artifacts like timing logs produced by the
+experiments and used to create the charts in the paper.
+
+
+composite-order: Experiments run to compare the performance differences for
+the composite-composite improvements and the composite ordering in
+radix-k.
+
+composite-order/intrepid-0256-smp.csv: Runs on Intrepid using 256 nodes in
+SMP mode.  Transparent images were generated.
+
+composite-order/intrepid-2048-smp.csv: Runs on Intrepid using 2048 nodes in
+SMP mode.  Transparent images were generated.
+
