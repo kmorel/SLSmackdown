@@ -9,8 +9,10 @@ set(images
   images/OpaqueOutput.png
   images/AccumulativeCompositeOrder.pdf
   images/TreeCompositeOrder.pdf
-  images/IceTCompositeImprovements0256.pdf
-  images/IceTCompositeImprovements2048.pdf
+  images/CompositeImprovements0256.pdf
+  images/CompositeImprovements2048.pdf
+  images/Interlace0256.pdf
+  images/Interlace2048.pdf
   )
 
 add_latex_document(SLSmackdown.tex
