@@ -13,6 +13,7 @@ set(images
   images/CompositeImprovements2048.pdf
   images/Interlace0256.pdf
   images/Interlace2048.pdf
+  images/InterlaceJumpshot.pdf
   )
 
 add_latex_document(SLSmackdown.tex

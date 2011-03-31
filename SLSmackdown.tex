@@ -634,20 +634,19 @@ adjusted.
 
 \begin{figure}[htbp]
   \centering
-  \sticky{Jumpshot captures of non-interlaced vs. interlaced}
+  \includegraphics{images/InterlaceJumpshot}
   \caption{Jumpshot logs demonstrating the effect of minimal-copy image
     interlacing.  The cyan color denotes the blending operation whereas the
     salmon and red indicate communication and waiting on messages.  Green
-    \sticky{Make sure jumpshot is recolored as such.} represents the
-    encoding, interlacing, and splitting of images. \sticky{Also remove
-      barrier.}}
+    represents the encoding and splitting of images, and the dark blue is
+    the time spent interlacing.}
   \label{fig:InterlaceJumpshot}
 \end{figure}
 
-Figure~\label{fig:InterlacePerformance} compares the compositing
+Figure~\ref{fig:InterlacePerformance} compares the compositing
 performance with and without image interlacing.  Image interlacing both
 reduces the overall time to composite and reduces the variability between
-different viewports.  Figure~\label{fig:InterlaceJumpshot} compares
+different viewports.  Figure~\ref{fig:InterlaceJumpshot} compares
 Jumpshot logs of compositing with and without image interlacing on 64
 processes using radix-k with $k = 16$.  With image interlacing, the
 compositing work is better balanced and less time is spent waiting for
