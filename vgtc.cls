@@ -112,16 +112,20 @@
     %\ExecuteOptions{tvcgpapersize}
 }
 
-%% the following code has partly been adapted from egpubl.cls
-\newif\ifpdf  % determine if we are running PDFLaTeX or not
-\ifx\pdfoutput\undefined \pdffalse % we are not running PDFLaTeX 
-\else 
-  %\pdfoutput=1 % we are running PDFLaTeX 
-  \pdftrue 
-\fi 
+% In latest LaTeX, something is automatically loading ifpdf.sty, which also
+% sets ifpdf.  Use that instead (inside the electronic option).
+
+%% %% the following code has partly been adapted from egpubl.cls
+%% \newif\ifpdf  % determine if we are running PDFLaTeX or not
+%% \ifx\pdfoutput\undefined \pdffalse % we are not running PDFLaTeX 
+%% \else 
+%%   %\pdfoutput=1 % we are running PDFLaTeX 
+%%   \pdftrue 
+%% \fi
 
 \newcommand{\vgtcinsertpkg}{}
 \DeclareOption{electronic}{%
+ \RequirePackage{ifpdf}
  \ifpdf 
   \renewcommand{\vgtcinsertpkg}{%
    \usepackage[pdftex,
