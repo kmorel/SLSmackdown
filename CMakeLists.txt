@@ -11,6 +11,7 @@ set(images
   images/TreeCompositeOrder.pdf
   images/CompositeImprovements0256.pdf
   images/CompositeImprovements2048.pdf
+  images/InterlaceDiagram.pdf
   images/Interlace0256.pdf
   images/Interlace2048.pdf
   images/InterlaceJumpshot.pdf
