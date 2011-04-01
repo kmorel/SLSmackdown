@@ -655,6 +655,36 @@ messages.
 \section{Telescoping Compositing}
 \label{sec:TelescopingCompositing}
 
+Intrepid VN mode: max composite time 12.88 seconds at 8191 processes.
+Anomalous telescoping radix-k, max at 0.55 seconds at 4097 processes.
+All runs used 10 frames instead of 100.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{images/TelescopeCompositeIntrepidSMP}
+  \caption{Comparison of telescoping and non-telescoping versions of binary
+    swap and radix-k (favoring $k=32$) on Intrepid in SMP mode.}
+  \label{fig:TelescopeCompositeIntrepidSMP}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{images/TelescopeCompositeIntrepidSMPZoomed}
+  \caption{Comparison of telescoping and non-telescoping versions of binary
+    swap and radix-k (favoring $k=32$) on Intrepid in SMP mode.  The
+    vertical axis is scaled to see detail in the telescoping algorithms.}
+  \label{fig:TelescopeCompositeIntrepidSMPZoomed}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{images/TelescopeCompositeIntrepidVN}
+  \caption{Comparison of telescoping and non-telescoping versions of binary
+    swap and telescoping version of radix-k (favoring $k=32$) on Intrepid
+    in VN mode.}
+  \label{fig:TelescopeCompositeIntrepidVN}
+\end{figure}
+
 \section{Scaling of Binary Swap and Radix-k}
 \label{sec:Scaling}
 

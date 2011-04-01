@@ -14,6 +14,9 @@ set(images
   images/Interlace0256.pdf
   images/Interlace2048.pdf
   images/InterlaceJumpshot.pdf
+  images/TelescopeCompositeIntrepidSMP.pdf
+  images/TelescopeCompositeIntrepidSMPZoomed.pdf
+  images/TelescopeCompositeIntrepidVN.pdf
   )
 
 add_latex_document(SLSmackdown.tex

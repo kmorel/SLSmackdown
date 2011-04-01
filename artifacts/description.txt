@@ -23,3 +23,12 @@ interlacing/interlace.clog2,no-interlace.clog2: Jumpshot logs for running
 with and without interlacing.  These runs were independent of those
 measured in intrepid-interlace-smp.csv.  Runs on Intrepid with 64 nodes in
 SMP mode.  Transparent 2K^2 images were generated.
+
+telescoping: Experiments run to compare the performance of folded binary
+swap and regular radix-k to their telescoped counterparts.
+
+telescoping/telescope-interepid-smp.csv.bz2: Runs on Intrepid up to 2048
+nodes/processes in SMP mode.
+
+telescoping/telescope-intrepid-vn.csv.bz2: Runs on Intrepid up to 2048 nodes,
+8192 processes in VN mode.
