@@ -696,6 +696,25 @@ All runs used 10 frames instead of 100.
 \section{Image Collection}
 \label{sec:ImageCollection}
 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{images/PartitionCollectIntrepidFull}
+  \caption{Compositing times on Intrepid when considering time to collect
+    image fragments into single image.  All times are given for binary
+    swap.}
+  \label{fig:PartitionCollectFull}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{images/PartitionCollectIntrepidReduced}
+  \caption{Compositing times on Intrepid when considering time to collect
+    image fragments into single image and the total number of partitions is
+    limited by collecting within rounds rather than dividing.  All times
+    are given for binary swap.}
+  \label{fig:PartitionCollectReduced}
+\end{figure}
+
 \section{Scaling of Binary Swap and Radix-k}
 \label{sec:Scaling}
 
@@ -714,6 +733,7 @@ All runs used 10 frames instead of 100.
     Intrepid up to 32,768 cores.  Transparent rendering uses 4 floats (16
     bytes) per pixel, and opaque rendering uses 4 bytes + 1 float (8 bytes)
     per pixel.}
+  \label{fig:Scaling}
 \end{figure}
 
 \section{Conclusions}
