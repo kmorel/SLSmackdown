@@ -19,6 +19,8 @@ set(images
   images/TelescopeCompositeIntrepidSMP.pdf
   images/TelescopeCompositeIntrepidSMPZoomed.pdf
   images/TelescopeCompositeIntrepidVN.pdf
+  images/ScalingTransparent.pdf
+  images/ScalingOpaque.pdf
   )
 
 add_latex_document(SLSmackdown.tex

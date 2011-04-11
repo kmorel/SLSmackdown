@@ -227,14 +227,14 @@ paper provides the following.
 \item The \keyterm{telescoping} algorithm, which can be applied to an
   existing image compositing algorithm that works best on powers of two,
   such as binary swap, to run efficiently on any number of processes.
+\item An investigation of the collection operation required at the end of
+  compositing and adjustments to the compositing algorithms to minimize
+  it.
 \item A comparison of the ever popular binary-swap algorithm with the newer
   radix-k algorithm on leadership-class high-performance computers.  These
   tests are performed with every enhancement one should expect in
   production quality parallel rendering as well as with a variety of
   rendering modes that can be encountered in production software.
-\item An investigation of the collection operation required at the end of
-  compositing and adjustments to the compositing algorithms to minimize
-  it.
 %% \item An investigation comparing the performance of multi-tile compositing
 %%   techniques\lcite{Moreland2001} with the best single image compositing
 %%   techniques for single images.
@@ -693,11 +693,28 @@ All runs used 10 frames instead of 100.
   \label{fig:TelescopeCompositeIntrepidVN}
 \end{figure}
 
+\section{Image Collection}
+\label{sec:ImageCollection}
+
 \section{Scaling of Binary Swap and Radix-k}
 \label{sec:Scaling}
 
-\section{Image Collection}
-\label{sec:ImageCollection}
+\begin{figure}[htbp]
+  \centering
+  \subfloat[Transparent Geometry]{
+    \includegraphics[width=.47\linewidth]{images/ScalingTransparent}
+    \label{fig:Scaling:Transparent}
+  }
+  \hfill
+  \subfloat[Opaque Geometry]{
+    \includegraphics[width=.47\linewidth]{images/ScalingOpaque}
+    \label{fig:Scaling:Opaque}
+  }
+  \caption{Performance of binary swap and several versions of radix-k on
+    Intrepid up to 32,768 cores.  Transparent rendering uses 4 floats (16
+    bytes) per pixel, and opaque rendering uses 4 bytes + 1 float (8 bytes)
+    per pixel.}
+\end{figure}
 
 \section{Conclusions}
 \label{sec:Conclusions}

@@ -24,6 +24,7 @@ with and without interlacing.  These runs were independent of those
 measured in intrepid-interlace-smp.csv.  Runs on Intrepid with 64 nodes in
 SMP mode.  Transparent 2K^2 images were generated.
 
+
 telescoping: Experiments run to compare the performance of folded binary
 swap and regular radix-k to their telescoped counterparts.
 
@@ -32,3 +33,9 @@ nodes/processes in SMP mode.
 
 telescoping/telescope-intrepid-vn.csv.bz2: Runs on Intrepid up to 2048 nodes,
 8192 processes in VN mode.
+
+
+scaling: Experiments run to test scaling of IceT on Intrepid.
+
+scaling/scaling-intrepid-vn.csv: Runs on Intrepid up to 8192 nodes, 32768
+processes in VN mode.
