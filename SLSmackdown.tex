@@ -802,6 +802,14 @@ and the two interfere with each other.
 \section{Image Collection}
 \label{sec:ImageCollection}
 
+As previously mentioned, parallel compositing algorithms finish with image
+data partitioned amongst the processes.  Although the compositing is
+technically finished at this point, it is of little practical use if it is
+split into thousands of pieces and distributed across nodes.  Real use
+cases require the images to be collected in some way.  For example,
+ParaView collects the image to the root node and then sends it over a
+socket to a GUI on the user's client desktop\lcite{Cedilnik2006}.
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{images/PartitionCollectIntrepidFull}
@@ -811,15 +819,58 @@ and the two interfere with each other.
   \label{fig:PartitionCollectFull}
 \end{figure}
 
+Because the collection of the image is so important in practice, it is
+proper to also measure its effect when scaling the image compositing
+algorithm.  Figure~\ref{fig:PartitionCollectFull} compares compositing
+times with and without image collection using an MPI\_Gatherv operation.
+Although the numbers given here are only given for binary swap, the
+variance between versions is minor compared to the overhead of collection.
+
+Clearly the MPI\_Gatherv collect is not scaling as well with respect to the
+rest of the compositing algorithm.  To make the collection more efficient,
+we propose limiting the number of partitions created in the parallel
+compositing algorithm with a simple change to the binary swap and radix-k
+algorithms.  The algorithms proceed in rounds as before.  As long as the
+total number of partitions created remains under a specified threshold,
+images are split and swapped as normal.  However, when this threshold of
+partitions is reached, images are no longer split.  Instead, one process
+collects all the image data from other processes in the group.  The
+collection process continues while the other processes drop
+out. \sticky{Figure demonstrating this?}
+
+Because this change causes processes to sit idle, it makes the compositing
+less efficient but potentially makes the collection more efficient.
+Collecting rather than splitting images is only useful to the point where
+the improvements in collection outweigh the added inefficiencies in
+compositing.  We should also note that limiting the number of partitions
+created limits the number of partitions used in the minimal-copy image
+interlacing described in Section~\ref{sec:ImageInterlacing}, but since our
+reduced image partitions only contain a few scan lines, the effect is
+minimal.
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{images/PartitionCollectIntrepidReduced}
-  \caption{Compositing times on Intrepid when considering time to collect
-    image fragments into single image and the total number of partitions is
-    limited by collecting within rounds rather than dividing.  All times
-    are given for binary swap.}
+  \caption{Compositing times on Intrepid when considering the time to
+    collect image fragments into a single image and the total number of
+    partitions is limited by collecting within rounds rather than
+    splitting.  All times are given for binary swap.}
   \label{fig:PartitionCollectReduced}
 \end{figure}
+
+Figure~\ref{fig:PartitionCollectReduced} demonstrates the effects of
+limiting the number of partitions on the binary swap algorithm (radix-k
+with various values for $k$ is measured in the following section).  Due to
+limits in processor allocation, we have not tested SMP mode with 8192
+nodes, but other measurements suggest that the results will be comparable
+to VN mode with 8192 cores.
+
+Our best composite + collect measurements in
+Figure~\ref{fig:PartitionCollectFull} occur at 512 partitions, so we
+limited the maximum number of partitions to 256 and up.  Limiting the
+number of partitions to collect clearly benefits the overall time for
+larger process counts.  Our optimal number of partitions is in the 256--512
+range.
 
 \section{Scaling of Binary Swap and Radix-k}
 \label{sec:Scaling}
