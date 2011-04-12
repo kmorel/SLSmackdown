@@ -895,12 +895,13 @@ range.
 
 For our final experiment, we observe the rendering system with all the
 improvements discussed in this paper (except telescoping because we only
-considered powers of two) scaled up to massive process counts.  Keep in
-mind that these timings include collecting image partitions into a single
-image, a necessary but expensive operation that is often overlooked.  All
-runs come from Intrepid scheduled in VN mode.  For all runs we set the
-maximum number of partitions to 512 although the actual number of
-partitions is smaller with values of $k$ that do not factor 512 evenly.
+considered powers of two) scaled up to massive process counts.
+Figure~\ref{fig:Scaling} summarizes the results.  Keep in mind that these
+timings include collecting image partitions into a single image, a
+necessary but expensive operation that is often overlooked.  All runs come
+from Intrepid scheduled in VN mode.  For all runs we set the maximum number
+of partitions to 512 although the actual number of partitions is smaller
+with values of $k$ that do not factor 512 evenly.
 
 For most runs, radix-k with $k=32$ and $k=64$ are significantly slower than
 the others.  This is not an effect of the radix-k algorithm itself but
@@ -912,7 +913,7 @@ compensated by faster collecting.
 
 Our results show an increase in overall time for the largest process
 counts.  This increase is primarily caused by an increase in collection
-times dispite our limits on the total number of partitions. \sticky{Plot
+times despite our limits on the total number of partitions. \sticky{Plot
   demonstrating this.}  Nevertheless, we are able to completely composite
 and collect an image on 65,536 cores in less than 0.12 seconds for
 transparent images (using floating point colors) and in less than 0.075
@@ -921,6 +922,32 @@ point depths).
 
 \section{Conclusions}
 \label{sec:Conclusions}
+
+In this paper we describe several optimizations to image compositing for
+sort-last parallel rendering.  We also demonstrate our completed system on
+some of the largest process counts to date.  Our findings show that image
+compositing continues to be a viable parallel rendering option on the
+largest computers today.  These data also suggest a path for future
+research.
+
+The design of new fundamental compositing algorithms in addition to binary
+swap, radix-k, and others is probably unnecessary.  In our observations,
+the performance difference between binary swap and the various factorings
+of radix-k are small compared to the other optimizations of the system such
+as sparse pixel encoding, load balancing, and image collection.  In fact,
+we find image collection to be the largest overhead currently in our
+rendering system.  Addressing image collection is one of the most promising
+avenues of future research.
+
+Another fruitful area of research is better methods to take advantage of
+multi-core processors.  Although it is reasonable to ignore the shared
+memory between the four cores on Intrepid, future computers will have many
+more cores per node.  Some introductory work has analyzed the behavior of
+image compositing in shared-memory
+architectures\lcite{Nouanesengsy2011,Reinhard2000}, but further refinement
+is required to take advantage of the hybrid distributed memory plus shared
+memory architecture of large systems and to evolve the compositing as
+architectures and rendering algorithms change.
 
 %% VGTC-specific section command.
 \acknowledgements{Funding for this work was provided by the SciDAC
