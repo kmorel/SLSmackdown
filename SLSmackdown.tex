@@ -655,6 +655,55 @@ messages.
 \section{Telescoping Compositing}
 \label{sec:TelescopingCompositing}
 
+A well known problem with binary swap is its inability to deal well with
+processor counts that are a power of two.  A simple and common technique to
+apply binary swap to an arbitrary count of processes is folding.  Folding
+finds the largest count of processes that is a power of two and forms a
+group of that size.  Any process outside of this group (of which there are
+always fewer than inside the group) sends its entire image to one process
+inside the group where it is blended with the local image.  The processes
+inside the power-of-two group composite normally while the remaining
+processes remain idle.  Yu \etal\scite{23Swap} show that there is a
+performance penalty for folding.
+
+2-3 swap\lcite{23Swap} augments binary swap by grouping processes in either
+twos or threes in each round rather than exclusively twos.  Because groups
+of two and three divide images differently, intermediate steps between
+rounds repartition images and send data to ensure that all processes have
+image partitions on the same boundaries.  Radix-k also supports process
+counts that are not a power of two by forming groups that are any factor of
+the process count.  This approach works well if the process count has small
+factors, but is inefficient for counts with large factors (as demonstrated
+by the results given in Figure~\ref{fig:TelescopeCompositeIntrepidSMP}.
+
+We provide an alternative algorithm called telescoping for supporting
+arbitrary process counts.  Our telescoping algorithm provides a simpler
+indexing and partitioning scheme than 2-3 swap and can be applied to most
+base parallel compositing algorithms.  We demonstrate telescoping to both
+binary swap and radix-k.  Telescoping works similar to folding except
+instead of sending images before compositing, images are sent afterward to
+minimize idle time.
+
+Telescoping works as follows.  \sticky{Should there be a formal algorithm
+  listed?}  At the onset, the algorithm finds the largest process subgroup
+that is a power of two.  Of the remaining processes, it again finds the
+largest power-of-two subgroup.  This is repeated until all processes belong
+to some group that has a power of two size.  Then the algorithm
+independently and concurrently runs a parallel image compositing (such as
+binary swap or radix-k) on each group.
+
+We now assume that each instance of the parallel image compositing results
+in an image evenly partitioned amongst all processes.  Most parallel image
+compositing algorithms (including binary swap and radix-k) satisfy this
+criterion.  To complete the image compositing, processes in the smaller
+groups send their partitions to those in the next larger group, starting
+with the smallest group.  The second smallest group receives image data
+from the smallest, blends this data to its local image data, and sends the
+results to the third smallest group.  This continues until the largest
+group receives and blends image data from the second largest, at which
+point the composite is complete.  Figure~\ref{fig:TelescopeDiagram}
+demonstrates the communication pattern of the telescoping algorithm.
+
 \begin{figure}[htbp]
   \centering
   \includegraphics{images/TelescopeDiagram}
@@ -663,11 +712,27 @@ messages.
   \label{fig:TelescopeDiagram}
 \end{figure}
 
-Intrepid VN mode: max composite time 12.88 seconds at 8191 processes.
-Anomalous telescoping radix-k, max at 0.55 seconds at 4097 processes.
-All runs used 10 frames instead of 100.
+Although the sending of image data across groups happens sequentially (from
+smallest to largest), the overhead is minimal.  In binary swap and radix-k,
+smaller process groups have fewer rounds and therefore usually finish
+earlier.  Thus, by the time the largest groups finish their ``local''
+composite, the image data from the next smallest group is usually waiting
+in an MPI buffer.
 
-\begin{figure}[htbp]
+Telescoping is most efficient (and easiest to implement) when the partition
+boundaries of a process group of one size align with those of other process
+groups.  The image partitioning algorithm in IceT ensures this consistent
+partitioning by first computing the regions for partitions of the largest
+group and then combining regions for smaller groups.  A second criterion of
+running telescoping efficiently is that it is necessary for a smaller group
+to know where each partition will be in the larger group.  As this
+partition indexing is a necessary part of the implementation of binary swap
+or radix-k, determining the same indices for telescoping is trivial.  It is
+also trivial to use telescoping with the minimal-copy image interlacing
+described in Section~\ref{sec:ImageInterlacing} since the resulting
+partitions are the same as those for compositing the largest process group.
+
+\begin{figure}[tbp]
   \centering
   \includegraphics[width=\linewidth]{images/TelescopeCompositeIntrepidSMP}
   \caption{Comparison of telescoping and non-telescoping versions of binary
@@ -675,7 +740,7 @@ All runs used 10 frames instead of 100.
   \label{fig:TelescopeCompositeIntrepidSMP}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[tbp]
   \centering
   \includegraphics[width=\linewidth]{images/TelescopeCompositeIntrepidSMPZoomed}
   \caption{Comparison of telescoping and non-telescoping versions of binary
@@ -684,7 +749,20 @@ All runs used 10 frames instead of 100.
   \label{fig:TelescopeCompositeIntrepidSMPZoomed}
 \end{figure}
 
-\begin{figure}[htbp]
+Figures \ref{fig:TelescopeCompositeIntrepidSMP} and
+\ref{fig:TelescopeCompositeIntrepidSMPZoomed} report the performance of
+binary swap and radix-k on Intrepid with and without telescoping.  Unlike
+the other data given in this paper, these measurements come from the
+averaging of 10 frames rather than 100 due to the large number of
+measurements we took.  Figure~\ref{fig:TelescopeCompositeIntrepidSMP}
+demonstrates that the original radix-k performs well for some process
+counts but abysmally for others.
+Figure~\ref{fig:TelescopeCompositeIntrepidSMPZoomed} shows an overhead for
+folding binary swap analogous to that reported by Yu \etal\scite{23Swap}.
+Telescoping makes both algorithms perform reasonably consistent for all
+process counts.
+
+\begin{figure}[tbp]
   \centering
   \includegraphics[width=\linewidth]{images/TelescopeCompositeIntrepidVN}
   \caption{Comparison of telescoping and non-telescoping versions of binary
@@ -692,6 +770,28 @@ All runs used 10 frames instead of 100.
     in VN mode.}
   \label{fig:TelescopeCompositeIntrepidVN}
 \end{figure}
+
+Figure~\ref{fig:TelescopeCompositeIntrepidVN} shows the data for the same
+experiment scheduled on Intrepid in VN mode to larger process counts (and
+again using 10 frames per measurement).  Values for radix-k without
+telescoping are not shown because the frame times are too long to measure
+in the amount of processor time we have available.  We did, however, record
+times for the largest process counts where we expect the worst behavior.
+Our longest average measurement with unaltered radix-k is 12.88 seconds per
+frame for 8191 processes (which is, unsurprisingly, the largest prime
+number of processes for which we ran).  The same compositing using the
+telescoping version of radix-k took only about 0.05 seconds per frame.
+
+We also note some telescoping radix-k measurements in VN mode that are
+anomalous compared to other process counts (although consistent for all
+frames of that run).  Note the blue spikes in
+Figure~\ref{fig:TelescopeCompositeIntrepidVN}.  The largest such spike is
+0.55 seconds per frame at 4097 processes.  We are not sure why these spike
+occur, but we observe that they happen when a small process group has to
+send images to a much larger process group.  Since these spikes only occur
+with radix-k and in VN mode, we suspect that this telescoping communication
+is happening at the same time as the larger group's radix-k communication,
+and the two interfere with each other.
 
 \section{Image Collection}
 \label{sec:ImageCollection}
