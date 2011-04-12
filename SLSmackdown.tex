@@ -323,9 +323,6 @@ common case tracking bounding boxes reduces the total number of pixels
 transmitted from $\Oh(n p)$ to $\Oh(n^{1/3} p)$, where $n$ and $p$ are the
 number of processes and pixels, respectively.
 
-\sticky{If the paper is long we can shorten it by removing the discussion
-  on active pixels.}
-
 The second approach for tracking active and inactive pixels is to use
 run-length encoding\lcite{Ahrens1998}.  A generic run-length encoder
 will look for run lengths of any repeated value.  However, when compositing
@@ -803,8 +800,18 @@ total number of partitions created remains under a specified threshold,
 images are split and swapped as normal.  However, when this threshold of
 partitions is reached, images are no longer split.  Instead, one process
 collects all the image data from other processes in the group.  The
-collection process continues while the other processes drop
-out. \sticky{Figure demonstrating this?}
+collection process continues while the other processes drop out.
+Figure~\ref{fig:CollectRounds} demonstrates two rounds of binary swap with
+one of the rounds collecting to reduce the number of partitions.
+Collection in radix-k works the same except that $k$ images are collected.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{images/CollectRounds}
+  \caption{Reducing the number of partitions created by four process in
+    binary swap to two partitions by collecting in the second round.}
+  \label{fig:CollectRounds}
+\end{figure}
 
 Because this change causes processes to sit idle, it makes the compositing
 less efficient but potentially makes the collection more efficient.

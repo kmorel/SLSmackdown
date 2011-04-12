@@ -20,6 +20,7 @@ set(images
   images/TelescopeCompositeIntrepidSMPZoomed.pdf
   images/TelescopeCompositeIntrepidVN.pdf
   images/PartitionCollectIntrepidFull.pdf
+  images/CollectRounds.pdf
   images/PartitionCollectIntrepidReduced.pdf
   images/ScalingTransparent.pdf
   images/ScalingOpaque.pdf
