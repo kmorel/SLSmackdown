@@ -35,6 +35,17 @@ telescoping/telescope-intrepid-vn.csv.bz2: Runs on Intrepid up to 2048 nodes,
 8192 processes in VN mode.
 
 
+collect: Experiments run to test the Gatherv collection after compositing
+and the in-place collection within rounds of radix-k.
+
+collect/pre-collect-intrepid.csv: Runs on Intrepid before changing radix-k
+to collect within rounds.
+
+collect/collect-intrepid.csv: Runs on Intrepid after changing radix-k to
+collect within rounds.  Tried many different maximum limits on the number
+of total partitions to make.
+
+
 scaling: Experiments run to test scaling of IceT on Intrepid.
 
 scaling/scaling-intrepid-vn.csv: Runs on Intrepid up to 8192 nodes, 32768
