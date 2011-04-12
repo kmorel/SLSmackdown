@@ -911,14 +911,30 @@ which is above our threshold.  Thus, the partition threshold is actually
 throttled back to 32, which results in slower compositing that is not
 compensated by faster collecting.
 
+\begin{figure}[htbp]
+  \centering
+  \subfloat[Transparent Geometry]{
+    \includegraphics[width=.47\linewidth]{images/ScalingCollectTransparent}
+    \label{fig:ScalingCollect:Transparent}
+  }
+  \hfill
+  \subfloat[Opaque Geometry]{
+    \includegraphics[width=.47\linewidth]{images/ScalingCollectOpaque}
+    \label{fig:ScalingCollect:Opaque}
+  }
+  \caption{Performance of radix-k with $k=8$ on Intrepid up to 65,536
+    cores.  Total time is divided into compositing and collection.}
+  \label{fig:ScalingCollect}
+\end{figure}
+
 Our results show an increase in overall time for the largest process
 counts.  This increase is primarily caused by an increase in collection
-times despite our limits on the total number of partitions. \sticky{Plot
-  demonstrating this.}  Nevertheless, we are able to completely composite
-and collect an image on 65,536 cores in less than 0.12 seconds for
-transparent images (using floating point colors) and in less than 0.075
-seconds for opaque images (using 8-bit fixed point colors and floating
-point depths).
+times despite our limits on the total number of partitions as is
+demonstrated in Figure~\ref{fig:ScalingCollect}.  Nevertheless, we are able
+to completely composite and collect an image on 65,536 cores in less than
+0.12 seconds for transparent images (using floating point colors) and in
+less than 0.075 seconds for opaque images (using 8-bit fixed point colors
+and floating point depths).
 
 \section{Conclusions}
 \label{sec:Conclusions}
