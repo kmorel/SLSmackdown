@@ -81,6 +81,7 @@
 \usepackage{cite}
 \usepackage{subfig}
 \usepackage{xspace}
+\usepackage{clrscode}
 \usepackage{hyperref}
 
 \usepackage{color}
@@ -663,9 +664,48 @@ Telescoping works as follows.  \sticky{Should there be a formal algorithm
   listed?}  At the onset, the algorithm finds the largest process subgroup
 that is a power of two.  Of the remaining processes, it again finds the
 largest power-of-two subgroup.  This is repeated until all processes belong
-to some group that has a power of two size.  Then the algorithm
+to some group that has a power of two size (where we consider a group of
+size 1 to be a power of two equal to $2^0$).  Then the algorithm
 independently and concurrently runs a parallel image compositing (such as
 binary swap or radix-k) on each group.
+
+\begin{figure}[htbp]
+  \begin{codebox}
+    \Procname{$\proc{TelescopingComposite}(\id{image}, \id{communicator})$}
+    \li $\id{commSize} \leftarrow \proc{size}(\id{image})$
+    \li $\id{mainSize} \leftarrow 2^{\lfloor \log_{2} \id{commSize} \rfloor}$
+        \Comment Largest power of two
+    \li $\id{remaining} \leftarrow \id{commSize} - \id{mainSize}$
+    \li $\id{mainGroup} \leftarrow$ subset of \id{communicator} of size \id{mainSize}
+    \li $\id{remainingGroup} \leftarrow$ compliment of \id{mainGroup}
+    \li \If $\proc{Rank}(communicator) \in \id{mainGroup}$
+    \zi \Then \Comment I belong to the main group.
+    \li       $\{ \id{compositedImage}, \id{compositedPartition} \}$
+    \zi       \> $\leftarrow \proc{BasicComposite}(image, mainGroup)$
+    \li       \If $\id{remaining} > 0$
+    \zi       \Then \Comment Need to retreive image
+    \li             $\id{sender} \leftarrow$ process in \id{remainingGroup}
+    \zi             \> holding partition corresponding to
+    \zi             \> \id{compositedPartition}
+    \li             $\id{telescopedImage} \leftarrow \proc{Receive}(\id{sender})$
+    \li             $\id{compositedImage} \leftarrow$
+    \zi             \> $ \proc{Blend}(\id{compositedImage}$
+    \zi             \>\> $\id{telescopedImage})$
+              \End
+    \li       \Return $\{ \id{compositedImage},$% \id{compositedPartition} \}$
+    \zi \Else \Comment I belong to the remaining group.
+    \li       $\{ \id{compositedImage}, \id{compositedPartition} \}$
+    \zi       \> $\leftarrow \proc{TelescopedComposite}(image, mainGroup)$
+    \li       \If $\id{compositedImage} \neq \emptyset$
+    \zi       \Then \Comment Still have image data to send.
+              \End
+    \li       \Return $\{ \emptyset, \emptyset \}$ \Comment Have no image, return nil.
+        \End
+  \end{codebox}
+  \caption{Algorithm to apply telescoping to an existing parallel image
+    compositing function (\proc{BasicComposite}).}
+  \label{fig:TelescopingComposite}
+\end{figure}
 
 We now assume that each instance of the parallel image compositing results
 in an image evenly partitioned amongst all processes.  Most parallel image
