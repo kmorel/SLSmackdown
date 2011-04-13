@@ -278,14 +278,14 @@ compositing at all times.
 
 Radix-k\lcite{RadixK} is a combination of binary swap and direct send.
 Radix-k first factors the number of processes into a series of what are
-called $k$ values, which need not be prime.  In a sequence of rounds, one
-per $k$ value, radix-k partitions the processes into groups of size $k$ and
-performs a direct send within each group.  The next round recurses into
-processes with the same partition until all $k$ values are used and each
-process has a unique partition.  When it has one round with a $k$ value
-equal to the number of processes, radix-k is equivalent to direct send.
-When it has $\log_{2} n$ rounds with all $k$ values equal to two, radix-k
-is equivalent to binary swap.
+called $k$ values.  In a sequence of rounds, one per $k$ value, radix-k
+partitions the processes into groups of size $k$ and performs a direct send
+within each group.  The next round recurses into processes with the same
+partition until all $k$ values are used and each process has a unique
+partition.  When it has one round with a $k$ value equal to the number of
+processes, radix-k is equivalent to direct send.  When it has $\log_{2} n$
+rounds with all $k$ values equal to two, radix-k is equivalent to binary
+swap.
 
 Radix-k further improves on binary swap by overlapping data transfers with
 computation.  When receiving data from multiple processes, which happens
@@ -376,7 +376,7 @@ readjusting partitions for consistency amongst all processes.
 Most sort-last algorithms rely on a static partitioning of the data, which
 removes any need to transfer geometry amongst processes but does not
 guarantee an even distribution of active pixels amongst processes.  Hybrid
-algorithms\lcite{Samanta2000} also use dynamic partitioning of the data to
+algorithms\lcite{Samanta2000} use dynamic partitioning of the data to
 collect geometry by screen region based on the current projection.  Hybrid
 algorithms reduce the compositing time at the expense of redistributing
 geometry, which means the effectiveness of the technique is dependent on
@@ -582,10 +582,10 @@ Figure~\ref{fig:Interlacing}.  Rather than picking arbitrary partitions,
 such as scan lines, to interlace, our interlacing uses the partitions that
 binary swap or radix-k will create anyway.  The partitions are reordered by
 reversing the bits of their indices, which creates a van der Corpt sequence
-to maximize the distance between adjacent blocks.  The image with the
-interlaced block is composited as normal.  Each resulting image partition
-is already intact, it is only the implicit offsets that need to be
-adjusted.
+to maximize the distance between adjacent blocks\lcite{LaValle2006}.  The
+image with the interlaced block is composited as normal.  Each resulting
+image partition is already intact, it is only the implicit offsets that
+need to be adjusted.
 
 \begin{figure}[htbp]
   \centering
@@ -615,14 +615,15 @@ adjusted.
   \label{fig:InterlaceJumpshot}
 \end{figure}
 
-Figure~\ref{fig:InterlacePerformance} compares the compositing
-performance with and without image interlacing.  Image interlacing both
+Figure~\ref{fig:InterlacePerformance} compares the compositing performance
+without (blue) and with (orange) image interlacing.  Image interlacing both
 reduces the overall time to composite and reduces the variability between
-different viewports.  Figure~\ref{fig:InterlaceJumpshot} compares
-Jumpshot logs of compositing with and without image interlacing on 64
-processes using radix-k with $k = 16$.  With image interlacing, the
-compositing work is better balanced and less time is spent waiting for
-messages.
+different viewports.  Figure~\ref{fig:InterlaceJumpshot} compares Jumpshot
+logs of compositing with and without image interlacing on 64 processes
+using radix-k with $k = 16$.  Jumpshot is a profiling tool that shows time
+on the horizontal axis and processes as rows on the vertical
+axis\lcite{Chan2008}.  With image interlacing, the compositing work is
+better balanced and less time is spent waiting for messages.
 
 \section{Telescoping Compositing}
 \label{sec:TelescopingCompositing}
@@ -730,7 +731,7 @@ the other data given in this paper, these measurements come from the
 averaging of 10 frames rather than 100 due to the large number of
 measurements we took.  Figure~\ref{fig:TelescopeCompositeIntrepidSMP}
 demonstrates that the original radix-k performs well for some process
-counts but abysmally for others.
+counts but poorly for others.
 Figure~\ref{fig:TelescopeCompositeIntrepidSMPZoomed} shows an overhead for
 folding binary swap analogous to that reported by Yu \etal\scite{23Swap}.
 Telescoping makes both algorithms perform reasonably consistent for all
@@ -760,12 +761,14 @@ We also note some telescoping radix-k measurements in VN mode that are
 anomalous compared to other process counts (although consistent for all
 frames of that run).  Note the blue spikes in
 Figure~\ref{fig:TelescopeCompositeIntrepidVN}.  The largest such spike is
-0.55 seconds per frame at 4097 processes.  We are not sure why these spike
+0.55 seconds per frame at 4097 processes.  We are not sure why these spikes
 occur, but we observe that they happen when a small process group has to
 send images to a much larger process group.  Since these spikes only occur
 with radix-k and in VN mode, we suspect that this telescoping communication
 is happening at the same time as the larger group's radix-k communication,
-and the two interfere with each other.
+and the two interfere with each other.  This is explained by the fact that
+in VN mode four processes share a single network interface controller,
+which must serialize incoming and outgoing messages.
 
 \section{Image Collection}
 \label{sec:ImageCollection}
