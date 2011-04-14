@@ -135,14 +135,11 @@
   has been with an arbitrary set of enhancements, if any are applied at
   all.  In this paper we take a leading production-quality
   image-compositing framework, IceT, and use it as a testing framework for
-  the leading image compositing algorithms of today.  The compositing
-  enhancements provided by IceT, including some introduced in this paper,
-  are employed in our measurements.  IceT also provides different
-  compositing mechanisms for different rendering environments such as
-  opaque surface versus volume rendering and fixed point versus floating
-  point color representations.  These variations are also considered in our
-  analysis.  To understand the behavior of these algorithms at very large
-  scale, we run tests on up to 64K cores of the Intrepid BlueGene/P at
+  the leading image compositing algorithms of today.  As we scale IceT to
+  ever increasing job sizes, we consider the image compositing systems
+  holistically, incorporate numerous optimizations, and discover several
+  improvements to the process never considered before.  We conclude by
+  demonstrating our system on 64K cores of the Intrepid BlueGene/P at
   Argonne National Laboratories.
 \end{abstract}
 
@@ -185,13 +182,16 @@ software.
 The intention of this work is to bridge the gap between independent
 parallel rendering algorithm development and practical application by
 bringing together multiple algorithms and enhancements together in a
-production-quality parallel rendering library.  More specifically, this
-paper provides the following.
+production-quality parallel rendering library.  This collection and
+integration of parallel image compositing technologies allows us to
+consider sort-last parallel rendering as a whole as it is used in real
+applications.  Through this environment, we discover bottlenecks in the
+sort-last parallel rendering process and provide novel solutions for them.
+More specifically, this paper provides the following.
 
 \begin{itemize}
-\item An introduction to a sort-last rendering framework named
-  \keyterm{IceT} that is general purpose, production quality, and fully
-  optimized.
+\item A description of \keyterm{IceT}, a sort-last rendering framework that
+  is general purpose, production quality, and fully optimized.
 \item An optimization to the compositing order for radix-k and
   direct send that minimizes the number of copies of non-overlapping
   pixels.
@@ -203,11 +203,14 @@ paper provides the following.
 \item An investigation of the collection operation required at the end of
   compositing and adjustments to the compositing algorithms to minimize
   it.
-\item A comparison of the ever popular binary-swap algorithm with the newer
-  radix-k algorithm on leadership-class high-performance computers.  These
-  tests are performed with every enhancement one should expect in
-  production-quality parallel rendering as well as with a variety of
-  rendering modes that can be encountered in production software.
+%% \item A comparison of the ever popular binary-swap algorithm with the newer
+%%   radix-k algorithm on leadership-class high-performance computers.  These
+%%   tests are performed with every enhancement one should expect in
+%%   production-quality parallel rendering as well as with a variety of
+%%   rendering modes that can be encountered in production software.
+\item A scaling study that compares the ever popular binary-swap algorithm
+  and the newer radix-k algorithm with a variety of $k$ values within the
+  IceT framework up to 64K cores.
 %% \item An investigation comparing the performance of multi-tile compositing
 %%   techniques\lcite{Moreland2001} with the best single image compositing
 %%   techniques for single images.
