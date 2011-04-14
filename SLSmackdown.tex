@@ -616,6 +616,47 @@ need to be adjusted.
   \label{fig:InterlaceJumpshot}
 \end{figure}
 
+\begin{figure*}
+  \begin{codebox}
+    \Procname{$\proc{TelescopingComposite}(\id{image}, \id{communicator})$}
+    \li $\id{commSize} \leftarrow \proc{size}(\id{image})$
+    \li $\id{mainSize} \leftarrow 2^{\lfloor \log_{2} \id{commSize} \rfloor}$
+        \Comment Largest power of two less than or equal to \id{commSize}
+    \li $\id{remaining} \leftarrow \id{commSize} - \id{mainSize}$
+    \li $\id{mainGroup} \leftarrow$ subset of \id{communicator} of size \id{mainSize}
+    \li $\id{remainingGroup} \leftarrow$ compliment of \id{mainGroup}
+    \li \If $\proc{Rank}(communicator) \in \id{mainGroup}$
+    \zi \Then \Comment I belong to the main group.
+    \li       $\{ \id{compositedImage}, \id{compositedPartition} \} \leftarrow \proc{BasicComposite}(image, mainGroup)$
+    \li       \If $\id{remaining} > 0$
+    \zi       \Then \Comment Need to retreive image
+    \li             $\id{sender} \leftarrow$ process in \id{remainingGroup} holding partition corresponding to \id{compositedPartition}
+    \label{line:SenderIndexMagic}
+    \li             $\id{telescopedImage} \leftarrow \proc{Receive}(\id{sender})$
+    \li             $\id{compositedImage} \leftarrow \proc{Blend}(\id{compositedImage}, \id{telescopedImage})$
+              \End
+    \li       \Return $\{ \id{compositedImage}, \id{compositedPartition} \}$
+    \zi \Else \Comment I belong to the remaining group.
+    \li       $\{ \id{compositedImage}, \id{compositedPartition} \} \leftarrow \proc{TelescopingComposite}(image, mainGroup)$
+    \li       \If $\id{compositedImage} \neq \emptyset$
+    \zi       \Then \Comment Still have image data to send.
+    \li             $\id{receiverSet} \leftarrow$ all processes in \id{mainGroup} holding a partition corresponding to \id{compositedImage}
+    \label{line:ReceiverIndexMagic}
+    \li             \For each $\id{receiver} \in \id{receiverSet}$
+    \zi             \Do
+    \li                  $\id{imagePiece} \leftarrow$ section of \id{compositedImage} matching the image piece in \id{receiver}
+    \li                  $\proc{Send}(\id{receiver}, \id{compositedImage})$
+                    \End
+              \End
+    \li       \Return $\{ \emptyset, \emptyset \}$ \Comment Have no image, return nil.
+        \End
+  \end{codebox}
+  \vspace*{-18pt}
+  \caption{Algorithm to apply telescoping to an existing parallel image
+    compositing function (\proc{BasicComposite}).}
+  \label{fig:TelescopingComposite}
+\end{figure*}
+
 Figure~\ref{fig:InterlacePerformance} compares the compositing performance
 without (blue) and with (orange) image interlacing.  Image interlacing both
 reduces the overall time to composite and reduces the variability between
@@ -660,52 +701,16 @@ binary swap and radix-k.  Telescoping works similar to folding except
 instead of sending images before compositing, images are sent afterward to
 minimize idle time.
 
-Telescoping works as follows.  \sticky{Should there be a formal algorithm
-  listed?}  At the onset, the algorithm finds the largest process subgroup
-that is a power of two.  Of the remaining processes, it again finds the
-largest power-of-two subgroup.  This is repeated until all processes belong
-to some group that has a power of two size (where we consider a group of
-size 1 to be a power of two equal to $2^0$).  Then the algorithm
-independently and concurrently runs a parallel image compositing (such as
-binary swap or radix-k) on each group.
-
-\begin{figure}[htbp]
-  \begin{codebox}
-    \Procname{$\proc{TelescopingComposite}(\id{image}, \id{communicator})$}
-    \li $\id{commSize} \leftarrow \proc{size}(\id{image})$
-    \li $\id{mainSize} \leftarrow 2^{\lfloor \log_{2} \id{commSize} \rfloor}$
-        \Comment Largest power of two
-    \li $\id{remaining} \leftarrow \id{commSize} - \id{mainSize}$
-    \li $\id{mainGroup} \leftarrow$ subset of \id{communicator} of size \id{mainSize}
-    \li $\id{remainingGroup} \leftarrow$ compliment of \id{mainGroup}
-    \li \If $\proc{Rank}(communicator) \in \id{mainGroup}$
-    \zi \Then \Comment I belong to the main group.
-    \li       $\{ \id{compositedImage}, \id{compositedPartition} \}$
-    \zi       \> $\leftarrow \proc{BasicComposite}(image, mainGroup)$
-    \li       \If $\id{remaining} > 0$
-    \zi       \Then \Comment Need to retreive image
-    \li             $\id{sender} \leftarrow$ process in \id{remainingGroup}
-    \zi             \> holding partition corresponding to
-    \zi             \> \id{compositedPartition}
-    \li             $\id{telescopedImage} \leftarrow \proc{Receive}(\id{sender})$
-    \li             $\id{compositedImage} \leftarrow$
-    \zi             \> $ \proc{Blend}(\id{compositedImage}$
-    \zi             \>\> $\id{telescopedImage})$
-              \End
-    \li       \Return $\{ \id{compositedImage},$% \id{compositedPartition} \}$
-    \zi \Else \Comment I belong to the remaining group.
-    \li       $\{ \id{compositedImage}, \id{compositedPartition} \}$
-    \zi       \> $\leftarrow \proc{TelescopedComposite}(image, mainGroup)$
-    \li       \If $\id{compositedImage} \neq \emptyset$
-    \zi       \Then \Comment Still have image data to send.
-              \End
-    \li       \Return $\{ \emptyset, \emptyset \}$ \Comment Have no image, return nil.
-        \End
-  \end{codebox}
-  \caption{Algorithm to apply telescoping to an existing parallel image
-    compositing function (\proc{BasicComposite}).}
-  \label{fig:TelescopingComposite}
-\end{figure}
+The \proc{TelescopingComposite} algorithm is listed in
+Figure~\ref{fig:TelescopingComposite} and works as follows.  At the onset,
+the algorithm finds the largest process subgroup that is a power of two.
+Of the remaining processes, it again finds the largest power-of-two
+subgroup.  This is repeated until all processes belong to some group that
+has a power of two size (where we consider a group of size 1 to be a power
+of two equal to $2^0$).  The \proc{TelescopingComposite} procedure finds
+groups by recursively calling itself.  The algorithm then independently and
+concurrently runs a parallel image compositing (such as binary swap or
+radix-k) on each group.
 
 We now assume that each instance of the parallel image compositing results
 in an image evenly partitioned amongst all processes.  Most parallel image
@@ -740,12 +745,15 @@ groups.  The image partitioning algorithm in IceT ensures this consistent
 partitioning by first computing the regions for partitions of the largest
 group and then combining regions for smaller groups.  A second criterion of
 running telescoping efficiently is that it is necessary for a smaller group
-to know where each partition will be in the larger group.  As this
-partition indexing is a necessary part of the implementation of binary swap
-or radix-k, determining the same indices for telescoping is trivial.  It is
-also trivial to use telescoping with the minimal-copy image interlacing
-described in Section~\ref{sec:ImageInterlacing} since the resulting
-partitions are the same as those for compositing the largest process group.
+to know where each partition will be in the larger group and vice versa.
+This second criterion is hidden in lines \ref{line:SenderIndexMagic} and
+\ref{line:ReceiverIndexMagic} of the \proc{TelescopingComposite} procedure.
+As this partition indexing is a necessary part of the implementation of
+binary swap or radix-k, determining the same indices for telescoping is
+trivial.  It is also trivial to use telescoping with the minimal-copy image
+interlacing described in Section~\ref{sec:ImageInterlacing} since the
+resulting partitions are the same as those for compositing the largest
+process group.
 
 \begin{figure}[tbp]
   \centering
@@ -864,10 +872,13 @@ less efficient but potentially makes the collection more efficient.
 Collecting rather than splitting images is only useful to the point where
 the improvements in collection outweigh the added inefficiencies in
 compositing.  We should also note that limiting the number of partitions
-created limits the number of partitions used in the minimal-copy image
+creates limits the number of partitions used in the minimal-copy image
 interlacing described in Section~\ref{sec:ImageInterlacing}, but since our
 reduced image partitions only contain a few scan lines, the effect is
-minimal.
+minimal.  Limiting the number of partitions also changes the indexing in
+the \proc{TelescopingComposite} algorithm (listed in
+Figure~\ref{fig:TelescopingComposite}) and adds a condition for when the
+internally called \proc{BasicComposite} returns a null image.
 
 \begin{figure}[htbp]
   \centering
