@@ -54,7 +54,7 @@
   %
   \alignauthor Wesley Kendall \\
   \affaddr{University of Tennessee, Knoxville} \\
-  \email{kendall@cs.utk.edu}
+  \email{kendall@eecs.utk.edu}
   %
   \alignauthor Tom Peterka \\
   \affaddr{Argonne National Laboratory} \\
@@ -221,9 +221,9 @@ classification of parallel rendering algorithms was
 introduced\lcite{Molnar1994}, these classifications are still used today
 because they accurately characterize and predict the scaling performance of
 these algorithms.  When rendering on a hundred or more distributed nodes,
-the most efficient class of algorithm is sort-last because it scales
+the most efficient class of algorithm is sort last.  Sort last scales
 extremely well with respect to the number of processes and size of the
-geometry being rendered and because the main contributing factor to its
+geometry being rendered.  The main contributing factor to sort last's
 overhead, the size of the image being rendered, is fixed by the display
 that we are using\lcite{Wylie2001}.
 
@@ -505,10 +505,10 @@ Given this observation, we made two independent improvements to the radix-k
 algorithm.  The first improvement speeds-up the compositing computation.
 Specifically, run lengths of non-overlapping pixels to be copied are
 collected and copied in blocks rather than independently casting and
-copying each pixel value, as was done before.  The second improvement
-constrains the compositing to follow the specific tree composite order.
-That is, rather than composite an incoming image whenever possible, force
-the compositing to happen in an order like that in
+copying each pixel value one at a time, as was done before.  The second
+improvement constrains the compositing to follow the specific tree
+composite order.  That is, rather than composite an incoming image whenever
+possible, force the compositing to happen in an order like that in
 Figure~\ref{fig:CompositeOrder:Tree}.  This constraint may cause radix-k to
 wait longer for incoming images, but the overhead is more than compensated
 by the improved blending performance.
@@ -665,7 +665,11 @@ logs of compositing with and without image interlacing on 64 processes
 using radix-k with $k = 16$.  Jumpshot is a profiling tool that shows time
 on the horizontal axis and processes as rows on the vertical
 axis\lcite{Chan2008}.  With image interlacing, the compositing work is
-better balanced and less time is spent waiting for messages.
+better balanced and less time is spent waiting for messages.  The overhead
+to initially interlace the images is minuscule compared to the time
+savings, and the overhead of reshuffling after compositing, as required by
+Takeuchi \etal\scite{Takeuchi2003}, or repartitioning during compositing,
+as required by Kendall \etal\scite{Kendall2010}.
 
 \section{Telescoping Compositing}
 \label{sec:TelescopingCompositing}
