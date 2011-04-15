@@ -610,18 +610,17 @@ for by the improved blending performance.
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[256 processes]{
-    \includegraphics[width=.97\linewidth]{images/CompositeImprovements0256}
-  }
-
-  \subfloat[2048 processes]{
+  %% \subfloat[256 processes]{
+  %%   \includegraphics[width=.97\linewidth]{images/CompositeImprovements0256}
+  %% }
+  %%
+  %% \subfloat[2048 processes]{
     \includegraphics[width=.97\linewidth]{images/CompositeImprovements2048}
-  }
+  %% }
   \caption{Comparative performance of radix-k with improved compositing
     computation and changing the order of compositing.  All runs were
-    performed on Intrepid in SMP mode generating images with $2048 \times
-    2048$ pixels and transparent blending.  The experiments were repeated
-    for 256 and 2048 nodes.}
+    performed on 2048 nodes of Intrepid in SMP mode generating images with
+    $2048 \times 2048$ pixels and transparent blending.}
   \label{fig:IceTCompositeImprovements}
 \end{figure}
 
