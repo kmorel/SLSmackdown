@@ -161,7 +161,7 @@ Ken Moreland,$^{\ddagger}$ Wesley Kendall,$^{*}$ Tom Peterka,$^{\dagger}$ and Ji
   ever increasing job sizes, we consider the image compositing systems
   holistically, incorporate numerous optimizations, and discover several
   improvements to the process never considered before.  We conclude by
-  demonstrating our system on 64K cores of the Intrepid BlueGene/P at
+  demonstrating our solution on 64K cores of the Intrepid BlueGene/P at
   Argonne National Laboratories.
 \end{abstract}
 
@@ -176,7 +176,7 @@ Ken Moreland,$^{\ddagger}$ Wesley Kendall,$^{*}$ Tom Peterka,$^{\dagger}$ and Ji
 \label{sec:Introduction}
 
 The staggering growth in HPC capability and scale of parallelism is rapidly 
-redefining the going standard of ``large scale" and reshaping priorities 
+redefining the standard of ``large scale" and reshaping priorities 
 in today's large-scale parallel visualization.
 Driven by use cases such as in-situ analysis, co-processing, and
 recent constraints in building specialized visualization 
@@ -210,8 +210,8 @@ enhancements.
 %compare the results with each other, and to impact user communities.
 
 In this work we created a software solution for parallel image compositing 
-at scale. In doing so, we evaluated and benchmarked leading algorithms and
-enhancements as well as developed novel functionalities needed in
+at scale. In doing so, we evaluated and benchmarked leading algorithms,
+enhancements, and developed novel functionalities needed in
 a complete solution.
 This collection and
 integration of parallel image compositing technologies enabled us to
@@ -219,11 +219,11 @@ consider sort-last parallel rendering as a whole as it is used in real
 applications. Through this study, we discover bottlenecks in the
 sort-last parallel rendering process and provide novel solutions for them.
 More importantly, we identify practical bounds of image compositing
-performance and report evidences that indicate image collection as 
+performance and report evidence that indicate image collection as 
 the most fruitful direction of future research of parallel rendering
 at scale.
 
-Our solution is also novel in the following ways.
+Our solution also includes the following novel contributions.
 \begin{packed_itemize}
 \item A new \textit{zero-copy} image interlacing algorithm that requires 
 no image copying to reconstruct the final image
