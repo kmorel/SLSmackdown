@@ -72,7 +72,7 @@
 
 \author{
 \alignauthor
-Ken Moreland$^\ddagger$, Wesley Kendall$^*$, Tom Peterka$^\dagger$ and Jian Huang$^*$\\
+Ken Moreland,$^{\ddagger}$ Wesley Kendall,$^{*}$ Tom Peterka,$^{\dagger}$ and Jian Huang$^{*}$\\
     %\affaddr{Dept. of Electrical Engineering and Computer Science}\\
     \affaddr{$^\ddagger$Sandia National Laboratory}\\
     \affaddr{$^*$University of Tennessee, Knoxville}\\
@@ -130,14 +130,14 @@ Ken Moreland$^\ddagger$, Wesley Kendall$^*$, Tom Peterka$^\dagger$ and Jian Huan
 % to have its own page.
 \renewcommand{\floatpagefraction}{.75}
 
-\newenvironment{packed_enum}{
-\begin{enumerate}
+\newenvironment{packed_itemize}{
+\begin{itemize}
   \setlength{\topsep}{0pt}
   \setlength{\itemsep}{0pt}
   \setlength{\parskip}{0pt}
   \setlength{\parsep}{0pt}
   \setlength{\partopsep}{0pt}
-}{\end{enumerate}}
+}{\end{itemize}}
 
 \begin{document}
 
@@ -224,7 +224,7 @@ the most fruitful direction of future research of parallel rendering
 at scale.
 
 Our solution is also novel in the following ways.
-\begin{packed_enum}
+\begin{packed_itemize}
 \item A new \textit{zero-copy} image interlacing algorithm that requires 
 no image copying to reconstruct the final image
 \item A new \textit{telescoping} algorithm that dramatically improves 
@@ -235,7 +235,7 @@ that minimizes pixel copying
 compositing algorithms
 \item A \textit{unified and reproducible} benchmark that compares 
 algorithms using all of these optimizations
-\end{packed_enum}
+\end{packed_itemize}
 
 Besides achieving scalability up to 64K cores --- the largest ever 
 reported in literature --- our solution is already under beta release 
@@ -322,7 +322,7 @@ geometry being rendered.  The main contributing factor to sort last's
 overhead, the size of the image being rendered, is fixed by the display
 that we are using\lcite{Wylie2001}.
 
-The main characteristics of sort-last parallel rendering is that geometry
+The main characteristic of sort-last parallel rendering is that geometry
 is statically partitioned; processes each independently render images using
 only their local partition, and these images are \keyterm{composited}
 together by blending or comparing pixels.  Consequently, it is the behavior
@@ -378,10 +378,10 @@ called $k$ values.  In a sequence of rounds, one per $k$ value, radix-k
 partitions the processes into groups of size $k$ and performs a direct send
 within each group.  The next round recurses into processes with the same
 partition until all $k$ values are used and each process has a unique
-partition.  When it has one round with a $k$ value equal to the number of
-processes, radix-k is equivalent to direct send.  When it has $\log_{2} n$
-rounds with all $k$ values equal to two, radix-k is equivalent to binary
-swap.
+partition.  Radix-k is equivalent to direct send when it has one round with
+a $k$ value equal to the number of processes.  Radix-k is equivalent to
+binary swap when it has $\log_{2} n$ rounds with all $k$ values equal to
+two.
 
 Radix-k further improves on binary swap by overlapping data transfers with
 computation.  When receiving data from multiple processes, which happens
@@ -537,11 +537,11 @@ node.  The intention of the mode is to run multiple threads to use all four
 cores, but in our experiments we run a single thread using only one core.
 The second mode, \keyterm{Virtual Node} (VN), runs four MPI processes on
 each Intrepid node.  It treats each core on the node as a distributed
-memory processes even though it is possible to share memory.  Data
+memory process even though it is possible to share memory.  Data
 transfers amongst the processes within a single node still require explicit
 MPI memory passing although the underlying MPI layer bypasses the network
 infrastructure in this case.  We consider both running modes because both
-are commonly used today and each has differing demands on the underlying
+are commonly used today and each places differing demands on the underlying
 subsystems.
 
 %% Supplemental experiments were run on Sandia National Laboratories' Red Sky
@@ -564,7 +564,7 @@ performance.  Deeper inspection revealed that although our radix-k
 implementation was properly overlapping communication with compositing
 computations, the computations took longer with larger values of $k$.
 
-This increase in compositing time is caused by a change in the order images
+This increase in compositing time is caused by a change in the order that images
 are composited together.  The order in which images are composited within a
 round is not specified in the original radix-k algorithm; however,
 generally images are composited in the order they are received and
@@ -606,31 +606,27 @@ composite order.  That is, rather than composite an incoming image whenever
 possible, force the compositing to happen in an order like that in
 Figure~\ref{fig:CompositeOrder:Tree}.  This constraint may cause radix-k to
 wait longer for incoming images, but the overhead is more than compensated
-by the improved blending performance.
+for by the improved blending performance.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\linewidth]{images/CompositeImprovements0256}
-  \caption{Comparative performance of radix-k with improved compositing
-    computation and changing the order of compositing.  All runs were
-    performed on 256 nodes of Intrepid in SMP mode generating images with
-    $2048 \times 2048$ pixels and transparent blending.}
-  \label{fig:IceTCompositeImprovements0256}
-\end{figure}
+  \subfloat[256 processes]{
+    \includegraphics[width=.97\linewidth]{images/CompositeImprovements0256}
+  }
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\linewidth]{images/CompositeImprovements2048}
+  \subfloat[2048 processes]{
+    \includegraphics[width=.97\linewidth]{images/CompositeImprovements2048}
+  }
   \caption{Comparative performance of radix-k with improved compositing
     computation and changing the order of compositing.  All runs were
-    performed on 2048 nodes of Intrepid in SMP mode generating images with
-    $2048 \times 2048$ pixels and transparent blending.}
-  \label{fig:IceTCompositeImprovements2048}
+    performed on Intrepid in SMP mode generating images with $2048 \times
+    2048$ pixels and transparent blending.  The experiments were repeated
+    for 256 and 2048 nodes.}
+  \label{fig:IceTCompositeImprovements}
 \end{figure}
 
 Results of these performance improvements are independently shown in
-Figures \ref{fig:IceTCompositeImprovements0256} and
-\ref{fig:IceTCompositeImprovements2048}.  The improvements in compositing
+Figure~\ref{fig:IceTCompositeImprovements}.  The improvements in compositing
 computation lower the overall compositing time and reduce the pixel-copying
 overhead of larger $k$ values.  The change in composite ordering removes
 the extra overhead of pixel-copying and maximizes the performance of larger
@@ -641,7 +637,7 @@ $k$ values.
 
 The major problem encountered with sparse parallel image compositing is
 that it introduces load imbalance, which limits the improvements attained
-from compressing images.  A straightforward approach to balance the
+by compressing images.  A straightforward approach to balance the
 compositing work is to interlace the
 images\lcite{Molnar1994,Takeuchi2003}.  Interlacing basically shuffles the
 pixels in the image such that any region of the image with more compositing
@@ -764,7 +760,7 @@ better balanced and less time is spent waiting for messages.  The overhead
 to initially interlace the images is minuscule compared to the time
 savings, and the overhead of reshuffling after compositing, as required by
 Takeuchi \etal\scite{Takeuchi2003}, or repartitioning during compositing,
-as required by Kendall \etal\scite{Kendall2010}.
+as required by Kendall \etal\scite{Kendall2010}, is no longer necessary.
 
 \section{Telescoping Compositing}
 \label{sec:TelescopingCompositing}
@@ -796,7 +792,7 @@ We provide an alternative algorithm called telescoping for supporting
 arbitrary process counts.  Our telescoping algorithm provides a simpler
 indexing and partitioning scheme than 2-3 swap and can be applied to most
 base parallel compositing algorithms.  We demonstrate telescoping to both
-binary swap and radix-k.  Telescoping works similar to folding except
+binary swap and radix-k.  Telescoping works similarly to folding except
 instead of sending images before compositing, images are sent afterward to
 minimize idle time.
 
@@ -811,8 +807,8 @@ groups by recursively calling itself.  The algorithm then independently and
 concurrently runs a parallel image compositing (such as binary swap or
 radix-k) on each group.
 
-We now assume that each instance of the parallel image compositing results
-in an image evenly partitioned amongst all processes.  Most parallel image
+We now assume that each instance of the parallel image compositing produces
+an image evenly partitioned amongst all processes.  Most parallel image
 compositing algorithms (including binary swap and radix-k) satisfy this
 criterion.  To complete the image compositing, processes in the smaller
 groups send their partitions to those in the next larger group, starting
@@ -866,8 +862,10 @@ process group.
   \centering
   \includegraphics[width=\linewidth]{images/TelescopeCompositeIntrepidSMPZoomed}
   \caption{Comparison of telescoping and non-telescoping versions of binary
-    swap and radix-k (favoring $k=32$) on Intrepid in SMP mode.  The
-    vertical axis is scaled to see detail in the telescoping algorithms.}
+    swap and radix-k (favoring $k=32$) on Intrepid in SMP mode.  The data
+    are the same as those in
+    Figure~\ref{fig:TelescopeCompositeIntrepidSMP}, but the vertical axis
+    is scaled to see detail in the telescoping algorithms.}
   \label{fig:TelescopeCompositeIntrepidSMPZoomed}
 \end{figure}
 
@@ -881,7 +879,7 @@ demonstrates that the original radix-k performs well for some process
 counts but poorly for others.
 Figure~\ref{fig:TelescopeCompositeIntrepidSMPZoomed} shows an overhead for
 folding binary swap analogous to that reported by Yu \etal\scite{23Swap}.
-Telescoping makes both algorithms perform reasonably consistent for all
+Telescoping makes both algorithms perform reasonably consistently for all
 process counts.
 
 \begin{figure}[tbp]
