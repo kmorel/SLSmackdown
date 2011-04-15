@@ -12,8 +12,7 @@ set(images
   images/CompositeImprovements0256.pdf
   images/CompositeImprovements2048.pdf
   images/InterlaceDiagram.pdf
-  images/Interlace0256.pdf
-  images/Interlace2048.pdf
+  images/Interlace.pdf
   images/InterlaceJumpshot.pdf
   images/TelescopeDiagram.pdf
   images/TelescopeCompositeIntrepidSMP.pdf
