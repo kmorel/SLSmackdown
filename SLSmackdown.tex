@@ -663,7 +663,7 @@ pixels, then we do not need the final reshuffling at all.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics{images/InterlaceDiagram}
+  \includegraphics[scale=.9]{images/InterlaceDiagram}
   \caption{Pixel shuffling in minimal-copy image interlacing.}
   \label{fig:Interlacing}
 \end{figure}
@@ -678,7 +678,7 @@ image with the interlaced block is composited as normal.  Each resulting
 image partition is already intact, it is only the implicit offsets that
 need to be adjusted.
 
-\begin{figure}[htbp]
+\begin{figure}%[htbp]
   \centering
   \includegraphics[width=\linewidth]{images/Interlace}
   \caption{Comparative performance of radix-k with and without image
@@ -687,7 +687,7 @@ need to be adjusted.
   \label{fig:InterlacePerformance}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}%[htbp]
   \centering
   \includegraphics{images/InterlaceJumpshot}
   \caption{Jumpshot logs demonstrating the effect of minimal-copy image
@@ -812,7 +812,7 @@ demonstrates the communication pattern of the telescoping algorithm.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics{images/TelescopeDiagram}
+  \includegraphics[scale=.9]{images/TelescopeDiagram}
   \caption{Augmenting an algorithm to composite on a number of processes
     that is not a power of two.}
   \label{fig:TelescopeDiagram}
@@ -949,7 +949,7 @@ Collection in radix-k works the same except that $k$ images are collected.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics{images/CollectRounds}
+  \includegraphics[scale=.9]{images/CollectRounds}
   \caption{Reducing the number of partitions created by four process in
     binary swap to two partitions by collecting in the second round.}
   \label{fig:CollectRounds}
