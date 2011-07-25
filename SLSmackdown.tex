@@ -123,6 +123,7 @@ Ken Moreland,$^{\ddagger}$ Wesley Kendall,$^{*}$ Tom Peterka,$^{\dagger}$ and Ji
 % Avoid putting figures on their own page.
 \renewcommand{\textfraction}{0.05}
 \renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.95}
 
 % Make sure this is big enough so that only big figures end up on their own
 % page but small enough so that if a figure does have to be on its own
@@ -194,7 +195,7 @@ stages of parallel rendering algorithms often scale very well.
 
 Whereas previous research considers rendering on the
 order of 100s of processes, recent efforts scaled algorithms to over 10,000
-processes\lcite{Peterka2009, Childs2010}.  
+processes\lcite{Peterka2009,Childs2010,Howison2010}.  
 Furthermore, to get around I/O bottlenecks, it is now more common to have
 visualization run in situ with
 simulation\lcite{Ma2009:SciDACReview,Ma2009:CG&A,Yu2010,Tu2006}.
@@ -237,8 +238,7 @@ compositing algorithms
 algorithms using all of these optimizations
 \end{packed_itemize}
 
-Besides achieving scalability up to 64K cores --- the largest ever 
-reported in literature --- our solution is already under beta release 
+Besides achieving scalability up to 64K cores, our solution is already released 
 through the production-quality software framework of IceT.
 It is the culmination of our team's research in image compositing, 
 immediately deployable at scale to impact computational science of today.
@@ -956,19 +956,22 @@ Collection in radix-k works the same except that $k$ images are collected.
 \end{figure}
 
 Because this change causes processes to sit idle, it makes the compositing
-less efficient but potentially makes the collection more efficient.
-Collecting rather than splitting images is only useful to the point where
-the improvements in collection outweigh the added inefficiencies in
-compositing.  We should also note that limiting the number of partitions
-creates limits the number of partitions used in the minimal-copy image
-interlacing described in Section~\ref{sec:ImageInterlacing}, but since our
-reduced image partitions only contain a few scan lines, the effect is
-minimal.  Limiting the number of partitions also changes the indexing in
-the \proc{TelescopingComposite} algorithm (listed in
-Figure~\ref{fig:TelescopingComposite}) and adds a condition for when the
-internally called \proc{BasicComposite} returns a null image.
+less efficient and the collection more efficient.  Compositing favors the
+maximum number of partitions whereas collecting favors the minimum.  We
+choose the image partitioning that optimizes the total time to both
+composite and collect the result.
 
-\begin{figure}[htbp]
+% The following seems pedantic and is enough to cause the paper to run over.
+%% We should also note that limiting the number of partitions
+%% also limits the number of partitions used in the minimal-copy image
+%% interlacing described in Section~\ref{sec:ImageInterlacing}, but since our
+%% reduced image partitions only contain a few scan lines, the effect is
+%% minimal.  Limiting the number of partitions also changes the indexing in
+%% the \proc{TelescopingComposite} algorithm (listed in
+%% Figure~\ref{fig:TelescopingComposite}) and adds a condition for when the
+%% internally called \proc{BasicComposite} returns a null image.
+
+\begin{figure}[bp]%Set to b because it happens to be in the right spot[htbp]
   \centering
   \includegraphics[width=\linewidth]{images/PartitionCollectIntrepidReduced}
   \caption{Compositing times on Intrepid when considering the time to
